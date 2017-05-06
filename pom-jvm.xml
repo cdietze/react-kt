@@ -18,6 +18,7 @@
             <artifactId>kotlin-stdlib-jre8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <!-- reflect is needed to get the class names of the exceptions of MultiFailureException -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
