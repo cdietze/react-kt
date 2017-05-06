@@ -49,7 +49,7 @@ abstract class Try<T> private constructor() {
             return this
         }
 
-        override fun <R> flatMap(func: (T) ->Try<R>): Try<R> {
+        override fun <R> flatMap(func: (T) -> Try<R>): Try<R> {
             try {
                 return func(value)
             } catch (t: Throwable) {
@@ -149,6 +149,6 @@ abstract class Try<T> private constructor() {
         }
 
         /** Lifts `func`, a function on values, to a function on tries.  */
-        fun <T, R> lift(func: (T) -> R): (Try<T>) -> Try<R> = { it.map(func)}
+        fun <T, R> lift(func: (T) -> R): (Try<T>) -> Try<R> = { it.map(func) }
     }
 }
