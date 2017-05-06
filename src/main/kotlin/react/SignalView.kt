@@ -61,6 +61,6 @@ interface SignalView<T> {
  * Called when a signal to which this slot is connected has emitted an event.
  * @param T the event type emitted by the signal.*/
 typealias SignalViewListener<T> = (T) -> Unit
-//interface SignalViewListener<in T> : RListener, (T) -> Unit, ValueView.Listener<T> {
+//interface SignalViewListener<in T> : RListener, (T) -> Unit, ValueViewListener<T> {
 //    override fun onChange(value: T, oldValue: T?) = invoke(value)
 //}

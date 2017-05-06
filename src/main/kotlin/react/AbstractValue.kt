@@ -35,9 +35,7 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
             }
 
             override fun connect(): Connection {
-                return outer.connect(object : ValueView.Listener<T> {
-                    override fun onChange(value: T, oldValue: T?) = notifyChange(func(value), oldValue?.let { func(it) })
-                })
+                return outer.connect { value: T, oldValue: T? -> notifyChange(func(value), oldValue?.let { func(it) }) }
             }
         }
     }
@@ -57,14 +55,8 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
             }
 
             override fun connect(): Connection {
-                conn = mapped.connect(object : ValueView.Listener<ValueView<M>> {
-                    override fun onChange(value: ValueView<M>, oldValue: ValueView<M>?) {
-                        reconnect()
-                    }
-                })
-                return mapped.get().connect(object : ValueView.Listener<M> {
-                    override fun onChange(value: M, oldValue: M?) = notifyChange(value, oldValue)
-                })
+                conn = mapped.connect { value: ValueView<M>, oldValue: ValueView<M>? -> reconnect() }
+                return mapped.get().connect { value: M, oldValue: M? -> notifyChange(value, oldValue) }
             }
 
             override fun disconnect() {
@@ -78,12 +70,7 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
         val outer = this
         return object : MappedSignal<T>() {
             override fun connect(): Connection {
-                return outer.connect(object : ValueView.Listener<T> {
-                    override fun onChange(value: T, oldValue: T?) {
-                        notifyEmit(value)
-                    }
-
-                })
+                return outer.connect { value: T, oldValue: T? -> notifyEmit(value) }
             }
         }
     }
@@ -96,18 +83,18 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
             return changes().filter(cond).next()
     }
 
-    override fun connect(listener: ValueView.Listener<T>): Connection {
+    override fun connect(listener: ValueViewListener<T>): Connection {
         return addConnection(listener)
     }
 
-    override fun connectNotify(listener: ValueView.Listener<T>): Connection {
+    override fun connectNotify(listener: ValueViewListener<T>): Connection {
         // connect before calling emit; if the listener changes the value in the body of onEmit, it
         // will expect to be notified of that change; however if onEmit throws a runtime exception,
         // we need to take care of disconnecting the listener because the returned connection
         // instance will never reach the caller
         val conn = connect(listener)
         try {
-            listener.onChange(get(), null)
+            listener(get(), null)
             return conn
         } catch (re: RuntimeException) {
             conn.close()
@@ -127,14 +114,14 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
     }
 //
 //    override fun connect(slot: Slot<in T>): Connection {
-//        return connect(slot as ValueView.Listener<in T>)
+//        return connect(slot as ValueViewListener<in T>)
 //    }
 //
 //    override fun connectNotify(slot: Slot<in T>): Connection {
-//        return connectNotify(slot as ValueView.Listener<in T>)
+//        return connectNotify(slot as ValueViewListener<in T>)
 //    }
 
-    override fun disconnect(listener: ValueView.Listener<in T>) {
+    override fun disconnect(listener: ValueViewListener<in T>) {
         removeConnection(listener)
     }
 
@@ -160,8 +147,8 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
         return cname.substring(cname.lastIndexOf(".") + 1) + "(" + get() + ")"
     }
 
-    override fun placeholderListener(): ValueView.Listener<T> {
-        val p = NOOP as ValueView.Listener<T>
+    override fun placeholderListener(): ValueViewListener<T> {
+        val p = NOOP as ValueViewListener<T>
         return p
     }
 
@@ -213,21 +200,15 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
 
     companion object {
 
-        val NOOP = object : ValueView.Listener<Any> {
-            override fun onChange(value: Any, oldValue: Any?) {}
-        }
+        val NOOP: ValueViewListener<Any> = { _, _ -> }
 
-        private fun <T> wrap(listener: SignalViewListener<T>): ValueView.Listener<T> {
-            return object : ValueView.Listener<T> {
-                override fun onChange(value: T, oldValue: T?) {
-                    listener.invoke(value)
-                }
-            }
+        private fun <T> wrap(listener: SignalViewListener<T>): ValueViewListener<T> {
+            return { value: T, oldValue: T? -> listener.invoke(value) }
         }
 
         protected val CHANGE: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, value: Any?, oldValue: Any?, ignored: Any?) {
-                (lner as ValueView.Listener<Any>).onChange(value!!, oldValue!!)
+                (lner as ValueViewListener<Any>).invoke(value!!, oldValue!!)
             }
         }
     }
