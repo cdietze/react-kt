@@ -203,7 +203,7 @@ abstract class RFuture<T> : Reactor() {
                     }
                     if (--_remain == 0) {
                         _error?.let { pseq.fail(it) }
-                        if(_error ==null) {
+                        if (_error == null) {
                             val results = _results as Array<T>
                             pseq.succeed(results.asList())
                         }
