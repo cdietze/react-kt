@@ -27,13 +27,11 @@ class ValueTest {
     @Test fun testSimpleListener() {
         val value = Value.create(42)
         val fired = booleanArrayOf(false)
-        value.connect(object : ValueView.Listener<Int> {
-            override fun onChange(nvalue: Int, ovalue: Int?) {
-                assertEquals(42, ovalue!!.toInt().toLong())
-                assertEquals(15, nvalue.toLong())
-                fired[0] = true
-            }
-        })
+        value.connect { nvalue: Int, ovalue: Int? ->
+            assertEquals(42, ovalue!!.toInt().toLong())
+            assertEquals(15, nvalue.toLong())
+            fired[0] = true
+        }
         assertEquals(42, value.update(15).toLong())
         assertEquals(15, value.get().toLong())
         assertTrue(fired[0])
@@ -169,8 +167,8 @@ class ValueTest {
         val value = Value.create(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
-        val listener = object : ValueView.Listener<Int> {
-            override fun onChange(newValue: Int, oldValue: Int?) {
+        val listener: ValueViewListener<Int> = object : ValueViewListener<Int> {
+            override fun invoke(newValue: Int, oldValue: Int?) {
                 assertEquals(expectedValue[0].toLong(), newValue.toInt().toLong())
                 fired[0] += 1
                 value.disconnect(this)
@@ -218,11 +216,7 @@ class ValueTest {
         val value = Value.create(42)
         val fired = AtomicInteger(0)
 
-        var listener: ValueView.Listener<Int>? = object : ValueView.Listener<Int> {
-            override fun onChange(value: Int, oldValue: Int?) {
-                fired.incrementAndGet()
-            }
-        }
+        var listener: ValueViewListener<Int>? = { value: Int, oldValue: Int? -> fired.incrementAndGet() }
         System.gc()
         System.gc()
         System.gc()

@@ -23,7 +23,7 @@ typealias UnitSlot = Slot<Any>
  * TODO(cdi) commented out for now, migrate whatever makes sense to kotlin later
  * Reacts to signal emissions.
  */
-//abstract class Slot<T> : ValueView.Listener<T>, SignalViewListener<T> {
+//abstract class Slot<T> : ValueViewListener<T>, SignalViewListener<T> {
 //    /**
 //     * Returns a slot that maps values via `f` and then passes them to this slot.
 //     * This is essentially function composition in that `slot.compose(f)` means
@@ -65,7 +65,7 @@ typealias UnitSlot = Slot<Any>
 //    }
 //
 //    /**
-//     * Allows a slot to be used as a [ValueView.Listener] by passing just the new value
+//     * Allows a slot to be used as a [ValueViewListener] by passing just the new value
 //     * through to [.onEmit].
 //     */
 //    override fun onChange(value: T, oldValue: T) {

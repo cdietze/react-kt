@@ -16,6 +16,11 @@
 
 package react
 
+/** Listener for value changes.
+ * The first parameter is the new value, the second is the old one or null on the first notification.
+ */
+typealias ValueViewListener<T> = (T, T?) -> Unit
+
 /**
  * A view of a [Value], to which listeners may be added, but which one cannot update. This
  * can be used in combination with [AbstractValue] to provide [Value] semantics to an
@@ -23,11 +28,6 @@ package react
  * consumers should require only a view on a value, rather than a concrete value.
  */
 interface ValueView<T> {
-    /** Used to observe changes to a value.  */
-    interface Listener<in T> {
-        /** Called when the value to which this listener is bound has changed.  */
-        fun onChange(value: T, oldValue: T?)
-    }
 
     /**
      * Returns the current value.
@@ -69,7 +69,7 @@ interface ValueView<T> {
      * being connected.
      * @return a connection instance which can be used to cancel the connection.
      */
-    fun connect(listener: Listener<in T>): Connection
+    fun connect(listener: ValueViewListener<in T>): Connection
 
     /**
      * Connects the supplied listener to this value, such that it will be notified when this value
@@ -80,13 +80,13 @@ interface ValueView<T> {
      * @return a connection instance which can be used to cancel the connectio
      * n.
      */
-   fun connectNotify(listener: Listener<in T>): Connection
+    fun connectNotify(listener: ValueViewListener<in T>): Connection
 
     /**
      * Disconnects the supplied listener from this value if it's connected. If the listener has been
      * connected multiple times, all connections are cancelled.
      */
-    fun disconnect(listener: Listener<in T>)
+    fun disconnect(listener: ValueViewListener<in T>)
 
     // TODO(cdi) re-add disconnect of slots and SignalViewListener. The problem is that we `wrap` these
     // when connecting, thus using references when disconnecting does not work
@@ -94,7 +94,7 @@ interface ValueView<T> {
 
     // these methods exist only to let javac know that it can synthesize a SignalViewListener
     // instance from a single argument lambda; otherwise they are unnecessary because
-    // SignalViewListener is a subtype of ValueView.Listener
+    // SignalViewListener is a subtype of ValueViewListener
 
     /**
      * Connects the supplied listener to this value, such that it will be notified when this value
