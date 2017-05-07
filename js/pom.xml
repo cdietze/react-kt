@@ -8,7 +8,6 @@
         <groupId>de.cdietze</groupId>
         <artifactId>react.kt-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>react.kt-js</artifactId>
