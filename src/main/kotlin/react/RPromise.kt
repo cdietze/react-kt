@@ -27,7 +27,7 @@ package react
  * completed as a useful "box" for its underlying value, without concern that references to long
  * satisfied listeners will be inadvertently retained.
  */
-class RPromise<T> : RFuture<T>() {
+open class RPromise<T> : RFuture<T>() {
 
     /** Causes this promise to be completed with `result`.  */
     fun complete(result: Try<T>) {
@@ -41,12 +41,12 @@ class RPromise<T> : RFuture<T>() {
     }
 
     /** Causes this promise to be completed successfully with `value`.  */
-    fun succeed(value: T) {
+    open fun succeed(value: T) {
         complete(Try.success(value))
     }
 
     /** Causes this promise to be completed with failure caused by `cause`.  */
-    fun fail(cause: Throwable) {
+    open fun fail(cause: Throwable) {
         complete(Try.failure<T>(cause))
     }
 
