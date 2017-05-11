@@ -20,7 +20,7 @@ package react
  * A signal that emits events of type `T`. [Slot]s may be connected to a signal to be
  * notified upon event emission.
  */
-class Signal<T> : AbstractSignal<T>() {
+open class Signal<T> : AbstractSignal<T>() {
 
     /**
      * Causes this signal to emit the supplied event to connected slots.
