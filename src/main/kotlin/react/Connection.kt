@@ -28,11 +28,6 @@ abstract class Connection : Closeable {
      */
     abstract override fun close()
 
-    @Deprecated("Call {@link #close} instead. ")
-    fun disconnect() {
-        close()
-    }
-
     /**
      * Converts this connection into a one-shot connection. After the first time the slot or
      * listener is notified, it will automatically be disconnected.
