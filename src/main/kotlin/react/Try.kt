@@ -22,133 +22,59 @@ package react
  * This class is not itself "reactive", but it facilitates a more straightforward interface and
  * implementation for [RFuture] and [RPromise].
  */
-abstract class Try<T> private constructor() {
+sealed class Try<out T> {
 
-    /** Represents a successful try. Contains the successful result.  */
-    class Success<T>(val value: T) : Try<T>() {
+    /** Returns true if this is a successful try, false if it is a failed try.  */
+    abstract fun isSuccess(): Boolean
 
-        override fun get(): T {
-            return value
-        }
-
-        override val failure: Throwable
-            get() = throw IllegalStateException()
-        override val isSuccess: Boolean
-            get() = true
-
-        override fun <R> map(func: (T) -> R): Try<R> {
-            try {
-                return success(func(value))
-            } catch (t: Throwable) {
-                return failure(t)
-            }
-
-        }
-
-        override fun recover(func: (Throwable) -> T): Try<T> {
-            return this
-        }
-
-        override fun <R> flatMap(func: (T) -> Try<R>): Try<R> {
-            try {
-                return func(value)
-            } catch (t: Throwable) {
-                return failure(t)
-            }
-
-        }
-
-        override fun toString(): String {
-            return "Success($value)"
-        }
-    }
-
-    /** Represents a failed try. Contains the cause of failure.  */
-    class Failure<T>(override val failure: Throwable) : Try<T>() {
-
-        override fun get(): T {
-            if (failure is RuntimeException) {
-                throw failure
-            } else if (failure is Error) {
-                throw failure
-            } else {
-                throw object : RuntimeException("Try failed") {
-                    override val cause: Throwable?
-                        get() = failure
-                }
-            }
-        }
-
-        override val isSuccess: Boolean
-            get() = false
-
-        override fun <R> map(func: (T) -> R): Try<R> {
-            return this.casted<R>()
-        }
-
-        override fun recover(func: (Throwable) -> T): Try<T> {
-            try {
-                return success(func(failure))
-            } catch (t: Throwable) {
-                return failure(t)
-            }
-
-        }
-
-        override fun <R> flatMap(func: (T) -> Try<R>): Try<R> {
-            return this.casted<R>()
-        }
-
-        override fun toString(): String {
-            return "Failure($failure)"
-        }
-
-        private fun <R> casted(): Try<R> {
-            return this as Try<R>
-        }
-    }
+    /** Returns true if this is a failed try, false if it is a successful try.  */
+    fun isFailure(): Boolean = !isSuccess()
 
     /** Returns the value associated with a successful try, or rethrows the exception if the try
-     * failed. If the exception is a checked exception, it will be thrown as a the `cause` of
-     * a newly constructed [RuntimeException].  */
+     * failed. */
     abstract fun get(): T
 
     /** Returns the cause of failure for a failed try. Throws [IllegalStateException] if
      * called on a successful try.  */
-    abstract val failure: Throwable
+    abstract fun failure(): Throwable
 
-    /** Returns try if this is a successful try, false if it is a failed try.  */
-    abstract val isSuccess: Boolean
+    /** Maps successful tries through `f`, passees failure through as is.  */
+    fun <R> map(f: (T) -> R): Try<R> = when (this) {
+        is Success -> Success(f(this.value))
+        is Failure -> this
+    }
 
-    /** Returns try if this is a failed try, false if it is a successful try.  */
-    val isFailure: Boolean
-        get() = !isSuccess
+    /** Maps successful tries through `f`, passes failure through as is.  */
+    fun <T, R> Try<T>.flatMap(f: (T) -> Try<R>): Try<R> = when (this) {
+        is Success -> f(this.value)
+        is Failure -> this
+    }
 
-    /** Maps successful tries through `func`, passees failure through as is.  */
-    abstract fun <R> map(func: (T) -> R): Try<R>
+    /** Represents a successful try. Contains the successful result.  */
+    data class Success<out T>(val value: T) : Try<T>() {
+        override fun isSuccess(): Boolean = true
+        override fun get(): T = value
+        override fun failure(): Throwable = throw IllegalStateException()
+    }
 
-    /** Maps failed tries through `func`, passes success through as is. Note: if `func`
-     * throws an exception, you will get back a failure try with the new failure. Ideally one
-     * could generalize the type `T` here but Java doesn't allow type parameters with lower
-     * bounds.  */
-    abstract fun recover(func: (Throwable) -> T): Try<T>
-
-    /** Maps successful tries through `func`, passes failure through as is.  */
-    abstract fun <R> flatMap(func: (T) -> Try<R>): Try<R>
+    /** Represents a failed try. Contains the cause of failure.  */
+    data class Failure(val cause: Throwable) : Try<Nothing>() {
+        override fun isSuccess(): Boolean = false
+        override fun get(): Nothing = throw cause
+        override fun failure(): Throwable = cause
+    }
 
     companion object {
-
-        /** Creates a successful try.  */
-        fun <T> success(value: T): Try<T> {
-            return Success(value)
-        }
-
-        /** Creates a failed try.  */
-        fun <T> failure(cause: Throwable): Try<T> {
-            return Failure(cause)
-        }
-
         /** Lifts `func`, a function on values, to a function on tries.  */
         fun <T, R> lift(func: (T) -> R): (Try<T>) -> Try<R> = { it.map(func) }
     }
+}
+
+/** Maps failed tries through `f`, passes success through as is. Note: if `f`
+ * throws an exception, you will get back a failure try with the new failure.
+ * This is defined as an extension function and not a member function because
+ * Kotlin would complain about type parameter T being in "in" position. */
+fun <T> Try<T>.recover(f: (Throwable) -> T): Try<T> = when (this) {
+    is Try.Success -> this
+    is Try.Failure -> Try.Success(f(this.cause))
 }
