@@ -58,7 +58,7 @@ open class AbstractSignal<T> : Reactor(), SignalView<T> {
         removeConnection(slot)
     }
 
-    internal override fun placeholderListener(): SignalViewListener<T> {
+    override fun placeholderListener(): SignalViewListener<T> {
         val p = Slots.NOOP as SignalViewListener<T>
         return p
     }
@@ -73,8 +73,8 @@ open class AbstractSignal<T> : Reactor(), SignalView<T> {
     companion object {
 
         protected val EMIT: Reactor.Notifier = object : Reactor.Notifier() {
-            override fun notify(slot: Any, event: Any?, _1: Any?, _2: Any?) {
-                (slot as SignalViewListener<Any?>)(event)
+            override fun notify(listener: Any, event: Any?, a2: Any?, a3: Any?) {
+                (listener as SignalViewListener<Any?>)(event)
             }
         }
     }

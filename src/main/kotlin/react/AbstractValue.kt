@@ -207,8 +207,8 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
         }
 
         protected val CHANGE: Reactor.Notifier = object : Reactor.Notifier() {
-            override fun notify(lner: Any, value: Any?, oldValue: Any?, ignored: Any?) {
-                (lner as ValueViewListener<Any>).invoke(value!!, oldValue!!)
+            override fun notify(listener: Any, value: Any?, oldValue: Any?, a3: Any?) {
+                (listener as ValueViewListener<Any>).invoke(value!!, oldValue!!)
             }
         }
     }
