@@ -35,7 +35,7 @@ abstract class RFuture<T> : Reactor() {
      * @return this future for chaining.
      */
     fun onSuccess(slot: SignalViewListener<in T>): RFuture<T> {
-        return onComplete({ result -> if (result.isSuccess) slot(result.get()) })
+        return onComplete({ result -> if (result.isSuccess()) slot(result.get()) })
     }
 
     /** Causes `slot` to be notified if/when this future is completed with failure. If it has
@@ -43,7 +43,7 @@ abstract class RFuture<T> : Reactor() {
      * @return this future for chaining.
      */
     fun onFailure(slot: SignalViewListener<in Throwable>): RFuture<T> {
-        return onComplete({ result -> if (result.isFailure) slot(result.failure) })
+        return onComplete({ result -> if (result.isFailure()) slot(result.failure()) })
     }
 
     /** Causes `slot` to be notified when this future is completed. If it has already
@@ -120,8 +120,8 @@ abstract class RFuture<T> : Reactor() {
     fun <R> flatMap(func: (T) -> RFuture<R>): RFuture<R> {
         val mapped = RPromise.create<R>()
         onComplete({ result: Try<T> ->
-            if (result.isFailure)
-                mapped.fail(result.failure)
+            if (result.isFailure())
+                mapped.fail(result.failure())
             else
                 try {
                     func(result.get()).onComplete(mapped.completer())
@@ -157,7 +157,7 @@ abstract class RFuture<T> : Reactor() {
 
         /** Returns a future with a pre-existing success value.  */
         fun <T> success(value: T): RFuture<T> {
-            return result(Try.success<T>(value))
+            return result(Try.Success(value))
         }
 
         /** Returns a future result for a `Unit` method.  */
@@ -167,7 +167,7 @@ abstract class RFuture<T> : Reactor() {
 
         /** Returns a future with a pre-existing failure value.  */
         fun <T> failure(cause: Throwable): RFuture<T> {
-            return result(Try.failure<T>(cause))
+            return result(Try.Failure(cause))
         }
 
         /** Returns a future with an already-computed result.  */
@@ -195,11 +195,11 @@ abstract class RFuture<T> : Reactor() {
 
             class Sequencer {
                 @Synchronized fun onResult(idx: Int, result: Try<T>) {
-                    if (result.isSuccess) {
+                    if (result.isSuccess()) {
                         _results[idx] = result.get()
                     } else {
                         if (_error == null) _error = MultiFailureException()
-                        _error!!.addFailure(result.failure)
+                        _error!!.addFailure(result.failure())
                     }
                     if (--_remain == 0) {
                         _error?.let { pseq.fail(it) }
@@ -266,7 +266,7 @@ abstract class RFuture<T> : Reactor() {
             val _results: MutableList<T> = ArrayList()
             var _remain = count
             val collector: SignalViewListener<Try<T>> = { result ->
-                if (result.isSuccess) _results.add(result.get())
+                if (result.isSuccess()) _results.add(result.get())
                 if (--_remain == 0) pseq.succeed(_results)
             }
             for (future in futures) future.onComplete(collector)

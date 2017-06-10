@@ -42,12 +42,12 @@ open class RPromise<T> : RFuture<T>() {
 
     /** Causes this promise to be completed successfully with `value`.  */
     open fun succeed(value: T) {
-        complete(Try.success(value))
+        complete(Try.Success(value))
     }
 
     /** Causes this promise to be completed with failure caused by `cause`.  */
     open fun fail(cause: Throwable) {
-        complete(Try.failure<T>(cause))
+        complete(Try.Failure(cause))
     }
 
     /** Returns a slot that can be used to complete this promise.  */
