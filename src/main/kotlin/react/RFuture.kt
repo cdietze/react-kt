@@ -28,7 +28,7 @@ package react
  * pass the resulting object to some other code via a slot. Failure can be handled once for all of
  * these operations and you avoid nesting yourself three callbacks deep.
  */
-abstract class RFuture<T> : Reactor() {
+abstract class RFuture<out T> : Reactor() {
 
     /** Causes `slot` to be notified if/when this future is completed with success. If it has
      * already succeeded, the slot will be notified immediately.
@@ -103,15 +103,6 @@ abstract class RFuture<T> : Reactor() {
     fun <R> map(func: (T) -> R): RFuture<R> {
         val lifted: (Try<T>) -> Try<R> = Try.lift(func)
         return transform(lifted)
-    }
-
-    /** Maps the value of a failed result using `func` upon arrival. Ideally one could
-     * generalize the type `T` here but Java doesn't allow type parameters with lower
-     * bounds.  */
-    fun recover(func: (Throwable) -> T): RFuture<T> {
-        val sigh: (Try<T>) -> Try<T> = { result -> result.recover(func) }
-        //val lifted = sigh as Function<Try<in T>, Try<T>>
-        return transform(sigh)
     }
 
     /** Maps a successful result to a new result using `func` when it arrives. Failure on the
@@ -273,4 +264,15 @@ abstract class RFuture<T> : Reactor() {
             return pseq
         }
     }
+}
+
+/** Maps the value of a failed result using `func` upon arrival. Ideally one could
+ * generalize the type `T` here but Java doesn't allow type parameters with lower
+ * bounds.
+ * This is defined as an extension function and not a member function because
+ * Kotlin would complain about type parameter T being in "in" position. */
+fun <T> RFuture<T>.recover(func: (Throwable) -> T): RFuture<T> {
+    val sigh: (Try<T>) -> Try<T> = { result -> result.recover(func) }
+    //val lifted = sigh as Function<Try<in T>, Try<T>>
+    return transform(sigh)
 }
