@@ -153,7 +153,7 @@ abstract class RFuture<out T> : Reactor() {
 
         /** Returns a future result for a `Unit` method.  */
         fun success(): RFuture<Unit> {
-            return success()
+            return success(Unit)
         }
 
         /** Returns a future with a pre-existing failure value.  */
