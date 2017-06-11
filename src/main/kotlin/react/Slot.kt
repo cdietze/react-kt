@@ -16,59 +16,41 @@
 
 package react
 
+/**
+ * Reacts to signal emissions.
+ */
 typealias Slot<T> = SignalViewListener<T>
 typealias UnitSlot = Slot<Any>
 
 /**
- * TODO(cdi) commented out for now, migrate whatever makes sense to kotlin later
- * Reacts to signal emissions.
+ * Returns a slot that maps values via `f` and then passes them to this slot.
+ * This is essentially function composition in that `slot.compose(f)` means
+ * `slot(f(value)))` where this slot is treated as a side effecting void function.
  */
-//abstract class Slot<T> : ValueViewListener<T>, SignalViewListener<T> {
-//    /**
-//     * Returns a slot that maps values via `f` and then passes them to this slot.
-//     * This is essentially function composition in that `slot.compose(f)` means
-//     * `slot(f(value)))` where this slot is treated as a side effecting void function.
-//     */
-//    fun <S> compose(f: Function<S, T>): Slot<S> {
-//        val outer = this
-//        return object : Slot<S>() {
-//            override fun onEmit(value: S) {
-//                outer.onEmit(f.apply(value))
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Returns a slot that is only notified when the signal to which this slot is connected emits a
-//     * value which causes `pred` to return true.
-//     */
-//    fun <S : T> filtered(pred: Function<in S, Boolean>): Slot<S> {
-//        val outer = this
-//        return object : Slot<S>() {
-//            override fun onEmit(value: S) {
-//                if (pred.apply(value)) outer.onEmit(value)
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Returns a new slot that invokes this slot and then evokes `after`.
-//     */
-//    fun <S : T> andThen(after: Slot<in S>): Slot<S> {
-//        val before = this
-//        return object : Slot<S>() {
-//            override fun onEmit(event: S) {
-//                before.onEmit(event)
-//                after.onEmit(event)
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Allows a slot to be used as a [ValueViewListener] by passing just the new value
-//     * through to [.onEmit].
-//     */
-//    override fun onChange(value: T, oldValue: T) {
-//        onEmit(value)
-//    }
-//}
+fun <T, S> Slot<T>.compose(f: (S) -> T): Slot<S> =
+        { value -> this@compose(f(value)) }
+
+/**
+ * Returns a slot that is only notified when the signal to which this slot is connected emits a
+ * value which causes `pred` to return true.
+ */
+fun <T, S : T> Slot<T>.filtered(pred: (S) -> Boolean): Slot<S> =
+        { value -> if (pred(value)) this@filtered(value) }
+
+/**
+ * Returns a new slot that invokes this slot and then evokes `after`.
+ */
+fun <T, S : T> Slot<T>.andThen(after: Slot<S>): Slot<S> =
+        { event ->
+            this@andThen(event)
+            after(event)
+        }
+
+/**
+ * Allows a slot to be used as a {@link ValueView.Listener} by passing just the new value
+ * through.
+ */
+fun <T> Slot<T>.asValueViewListener(): ValueViewListener<T> =
+        { newValue, oldValue ->
+            this@asValueViewListener(newValue)
+        }
