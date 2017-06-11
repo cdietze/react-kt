@@ -136,7 +136,7 @@ abstract class RFuture<out T> : Reactor() {
      */
     abstract fun result(): Try<T>?
 
-    internal override fun placeholderListener(): RListener {
+    override fun placeholderListener(): RListener {
         /*@SuppressWarnings("unchecked")*/
         return Slots.NOOP
     }

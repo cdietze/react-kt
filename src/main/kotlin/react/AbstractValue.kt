@@ -112,22 +112,10 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
     override fun connectNotify(listener: SignalViewListener<T>): Connection {
         return connectNotify(wrap(listener))
     }
-//
-//    override fun connect(slot: Slot<in T>): Connection {
-//        return connect(slot as ValueViewListener<in T>)
-//    }
-//
-//    override fun connectNotify(slot: Slot<in T>): Connection {
-//        return connectNotify(slot as ValueViewListener<in T>)
-//    }
 
     override fun disconnect(listener: ValueViewListener<in T>) {
         removeConnection(listener)
     }
-
-//    override fun disconnect(listener: SignalViewListener<in T>) {
-//        removeConnection(listener)
-//    }
 
     override fun hashCode(): Int {
         val value = get()
@@ -213,7 +201,3 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
         }
     }
 }
-/**
- * Updates the value contained in this instance and notifies registered listeners.
- * @return the previously contained value.
- */
