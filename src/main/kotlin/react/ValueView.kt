@@ -88,14 +88,6 @@ interface ValueView<T> {
      */
     fun disconnect(listener: ValueViewListener<in T>)
 
-    // TODO(cdi) re-add disconnect of slots and SignalViewListener. The problem is that we `wrap` these
-    // when connecting, thus using references when disconnecting does not work
-//    fun disconnect(listener: SignalViewListener<in T>)
-
-    // these methods exist only to let javac know that it can synthesize a SignalViewListener
-    // instance from a single argument lambda; otherwise they are unnecessary because
-    // SignalViewListener is a subtype of ValueViewListener
-
     /**
      * Connects the supplied listener to this value, such that it will be notified when this value
      * changes. The listener is held by a strong reference, so it's held in memory by virtue of
@@ -112,26 +104,4 @@ interface ValueView<T> {
      * @return a connection instance which can be used to cancel the connection.
      */
     fun connectNotify(listener: SignalViewListener<in T>): Connection
-
-    // these methods exist to help javac disambiguate between the above two methods, yay
-    // TODO: when we drop support for java 1.7, we can remove these methods
-
-    /**
-     * Connects the supplied listener to this value, such that it will be notified when this value
-     * changes. The listener is held by a strong reference, so it's held in memory by virtue of
-     * being connected.
-     * @return a connection instance which can be used to cancel the connection.
-     */
-    //TODO(cdi) cleanup
-    //fun connect(listener: Slot<in T>): Connection
-
-    /**
-     * Connects the supplied listener to this value, such that it will be notified when this value
-     * changes. Also immediately notifies the listener of the current value. If the notification
-     * triggers an unchecked exception, the slot will automatically be disconnected and the caller
-     * need not worry about cleaning up after itself.
-     * @return a connection instance which can be used to cancel the connection.
-     */
-    //TODO(cdi) cleanup
-    //fun connectNotify(listener: Slot<in T>): Connection
 }
