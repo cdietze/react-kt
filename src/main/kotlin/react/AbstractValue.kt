@@ -143,8 +143,9 @@ abstract class AbstractValue<T> : Reactor(), ValueView<T> {
     /**
      * Updates the value contained in this instance and notifies registered listeners iff said
      * value is not equal to the value already contained in this instance (per [.areEqual]).
+     * TODO(cdi) remove `open` after `tripleklay.sound.SoundBoard.getVolume` is refactored
      */
-    protected fun updateAndNotifyIf(value: T): T {
+    open protected fun updateAndNotifyIf(value: T): T {
         return updateAndNotify(value, false)
     }
 
