@@ -27,7 +27,7 @@ class SignalTest {
     class Counter : UnitSlot {
         var notifies: Int = 0
 
-        override fun invoke(e: Any) {
+        override fun invoke(e: Any?) {
             notifies++
         }
     }
@@ -57,7 +57,7 @@ class SignalTest {
 
         class TestSlot : UnitSlot {
             var order: Int = 0
-            override fun invoke(e: Any) {
+            override fun invoke(e: Any?) {
                 order = ++counter[0]
             }
         }

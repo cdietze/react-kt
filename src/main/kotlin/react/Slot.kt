@@ -20,7 +20,7 @@ package react
  * Reacts to signal emissions.
  */
 typealias Slot<T> = SignalViewListener<T>
-typealias UnitSlot = Slot<Any>
+typealias UnitSlot = Slot<Any?>
 
 /**
  * Returns a slot that maps values via `f` and then passes them to this slot.
