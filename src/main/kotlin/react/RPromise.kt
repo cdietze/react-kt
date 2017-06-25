@@ -74,7 +74,7 @@ open class RPromise<T> : RFuture<T>() {
 
         protected val COMPLETE: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(listener: Any, value: Any?, i0: Any?, i1: Any?) {
-                (listener as SignalViewListener<Try<Any>>)(value as Try<Any>)
+                (listener as SignalViewListener<Try<Any?>>)(value as Try<Any?>)
             }
         }
     }
