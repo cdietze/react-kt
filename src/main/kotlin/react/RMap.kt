@@ -36,25 +36,26 @@ class RMap<K, V>
          * Notifies listener of an added or updated mapping. This method will call the
          * old-value-forgetting version ([.onPut]) by default.
          */
-        fun onPut(key: K?, value: V?, oldValue: V?) {
+        fun onPut(key: K, value: V, oldValue: V?) {
             onPut(key, value)
         }
 
         /** Notifies listener of an added or updated mapping.  */
-        fun onPut(key: K?, value: V?) {
+        fun onPut(key: K, value: V) {
             // noop
         }
 
         /**
          * Notifies listener of a removed mapping. This method will call the old-value-forgetting
          * version ([.onRemove]) by default.
+         * [oldValue] may be `null` when force removing a inexistant key.
          */
-        fun onRemove(key: K?, oldValue: V?) {
+        fun onRemove(key: K, oldValue: V?) {
             onRemove(key)
         }
 
         /** Notifies listener of a removed mapping.  */
-        fun onRemove(key: K?) {
+        fun onRemove(key: K) {
             // noop
         }
     }
@@ -134,11 +135,11 @@ class RMap<K, V>
 
             override fun connect(): Connection {
                 return this@RMap.connect(object : RMap.Listener<K, V> {
-                    override fun onPut(pkey: K?, value: V?, ovalue: V?) {
+                    override fun onPut(pkey: K, value: V, ovalue: V?) {
                         if (key == pkey && ovalue == null) notifyChange(true, false)
                     }
 
-                    override fun onRemove(rkey: K?, ovalue: V?) {
+                    override fun onRemove(rkey: K, ovalue: V?) {
                         if (key == rkey) notifyChange(false, true)
                     }
                 })
@@ -160,11 +161,11 @@ class RMap<K, V>
 
             override fun connect(): Connection {
                 return this@RMap.connect(object : RMap.Listener<K, V> {
-                    override fun onPut(pkey: K?, value: V?, ovalue: V?) {
+                    override fun onPut(pkey: K, value: V, ovalue: V?) {
                         if (key == pkey) notifyChange(value, ovalue)
                     }
 
-                    override fun onRemove(pkey: K?, ovalue: V?) {
+                    override fun onRemove(pkey: K, ovalue: V?) {
                         if (key == pkey) notifyChange(null, ovalue)
                     }
                 })
@@ -469,13 +470,13 @@ class RMap<K, V>
 
         protected val PUT: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, key: Any?, value: Any?, oldValue: Any?) {
-                (lner as Listener<Any, Any>).onPut(key, value, oldValue)
+                (lner as Listener<Any, Any>).onPut(key!!, value!!, oldValue)
             }
         }
 
         protected val REMOVE: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, key: Any?, oldValue: Any?, ignored: Any?) {
-                (lner as Listener<Any, Any>).onRemove(key, oldValue)
+                (lner as Listener<Any, Any>).onRemove(key!!, oldValue)
             }
         }
     }

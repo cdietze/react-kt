@@ -26,11 +26,11 @@ import kotlin.collections.MutableMap.MutableEntry
 class RMapTest {
     class Counter : RMap.Listener<Any, Any> {
         var notifies: Int = 0
-        override fun onPut(key: Any?, value: Any?) {
+        override fun onPut(key: Any, value: Any) {
             notifies++
         }
 
-        override fun onRemove(key: Any?) {
+        override fun onRemove(key: Any) {
             notifies++
         }
     }
@@ -43,7 +43,7 @@ class RMapTest {
 
         // add a mapping, ensure that we're notified
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onPut(key: Int?, value: String?, ovalue: String?) {
+            override fun onPut(key: Int, value: String, ovalue: String?) {
                 assertEquals(42, key!!.toInt().toLong())
                 assertEquals("LTUAE", value)
                 assertNull(ovalue)
@@ -58,7 +58,7 @@ class RMapTest {
 
         // remove a mapping, ensure that we're notified
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onRemove(key: Int?, ovalue: String?) {
+            override fun onRemove(key: Int, ovalue: String?) {
                 assertEquals(42, key!!.toInt().toLong())
                 assertEquals("LTUAE", ovalue)
             }
@@ -79,7 +79,7 @@ class RMapTest {
 
         // add a mapping, ensure that we're notified
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onPut(key: Int?, value: String?, ovalue: String?) {
+            override fun onPut(key: Int, value: String, ovalue: String?) {
                 assertEquals(42, key!!.toInt().toLong())
                 assertEquals("LTUAE", value)
             }
@@ -93,7 +93,7 @@ class RMapTest {
 
         // remove a mapping, ensure that we're notified
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onRemove(key: Int?, ovalue: String?) {
+            override fun onRemove(key: Int, ovalue: String?) {
                 assertEquals(42, key!!.toInt().toLong())
             }
         })
@@ -188,18 +188,18 @@ class RMapTest {
         val puts = intArrayOf(0)
         val removes = intArrayOf(0)
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onPut(key: Int?, value: String?, ovalue: String?) {
+            override fun onPut(key: Int, value: String, ovalue: String?) {
                 puts[0]++
             }
 
-            override fun onRemove(key: Int?, ovalue: String?) {
+            override fun onRemove(key: Int, ovalue: String?) {
                 removes[0]++
             }
         })
 
         // test the update of a value from the entry set
         map.connect(object : RMap.Listener<Int, String> {
-            override fun onPut(key: Int?, value: String?, ovalue: String?) {
+            override fun onPut(key: Int, value: String, ovalue: String?) {
                 assertEquals(42, key!!.toInt().toLong())
                 assertEquals("Mu", value)
                 assertEquals("LTUAE", ovalue)
