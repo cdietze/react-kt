@@ -82,13 +82,12 @@ interface Closeable {
 
         /** Creates a closable that closes multiple connections at once.  */
         fun join(vararg cons: Closeable): Closeable {
+            val c: Array<Closeable?> = cons as Array<Closeable?>
             return object : Closeable {
                 override fun close() {
-                    for (ii in cons.indices) {
-                        if (cons[ii] == null) continue
-                        cons[ii].close()
-                        // TODO(cdi) check if we need the next line - kotlin won't allow it, because vararg means `out` parameter
-                        // cons[ii] = null
+                    for (ii in c.indices) {
+                        c[ii]?.close()
+                        c[ii] = null
                     }
                 }
             }
