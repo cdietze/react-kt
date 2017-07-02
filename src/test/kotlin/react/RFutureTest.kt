@@ -20,7 +20,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.util.*
 
-class RFutureTest : TestBase() {
+class RFutureTest {
 
     inner class FutureCounter {
         val successes = TestBase.Counter()
@@ -309,7 +309,7 @@ class RFutureTest : TestBase() {
         val sucsuc = RFuture.sequence(string, integer)
         sucsuc.onSuccess { tup: Pair<String, Int> ->
             assertEquals("string", tup.first)
-            assertEquals(42.toInt(), tup.second)
+            assertEquals(42, tup.second)
         }
         counter.bind(sucsuc)
         counter.check("tuple2 seq success/success", 1, 0, 1)

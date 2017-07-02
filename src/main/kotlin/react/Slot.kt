@@ -48,6 +48,17 @@ fun <T, S : T> Slot<T>.andThen(after: Slot<S>): Slot<S> = { event ->
 }
 
 /**
+ * Returns a new slot that invokes `before` and then this slot.
+ *
+ * Can be useful for debugging, e.g.:
+ * `slot.butBeforeInvoke({ println("event is $it") })`
+ */
+fun <T, S : T> Slot<T>.butBeforeInvoke(before: Slot<S>): Slot<S> = { event ->
+    before(event)
+    this@butBeforeInvoke(event)
+}
+
+/**
  * Allows a slot to be used as a {@link ValueView.Listener} by passing just the new value
  * through.
  */

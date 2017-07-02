@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package react
 
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
-object TestBase {
+/**
+ * Tests basic signals and slots behavior.
+ */
+class SlotTest {
 
-    class Counter : Slot<Any?> {
-        fun trigger() {
-            _count++
-        }
+    open class A
+    class B : A()
 
-        fun assertTriggered(count: Int) {
-            assertEquals(count.toLong(), _count.toLong())
-        }
+    @Test fun andThenShouldBeCalledAfterwards() {
+        var s = ""
+        val a: Slot<A> = { s += "a" }
+        val b: Slot<B> = { s += "b" }
+        val c: Slot<B> = a.andThen(b)
+        c.invoke(B())
+        assertEquals(s, "ab")
+    }
 
-        fun assertTriggered(message: String, count: Int) {
-            assertEquals(message, count.toLong(), _count.toLong())
-        }
-
-        fun reset() {
-            _count = 0
-        }
-
-        override fun invoke(value: Any?) {
-            trigger()
-        }
-
-        private var _count: Int = 0
+    @Test fun beforeShouldBeCalledBefore() {
+        var s = ""
+        val a: Slot<A> = { s += "a" }
+        val b: Slot<B> = { s += "b" }
+        val c: Slot<B> = a.butBeforeInvoke(b)
+        c.invoke(B())
+        assertEquals(s, "ba")
     }
 }
