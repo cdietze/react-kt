@@ -27,30 +27,30 @@ typealias UnitSlot = Slot<Any?>
  * This is essentially function composition in that `slot.compose(f)` means
  * `slot(f(value)))` where this slot is treated as a side effecting void function.
  */
-fun <T, S> Slot<T>.compose(f: (S) -> T): Slot<S> =
-        { value -> this@compose(f(value)) }
+fun <T, S> Slot<T>.compose(f: (S) -> T): Slot<S> = { value ->
+    this@compose(f(value))
+}
 
 /**
  * Returns a slot that is only notified when the signal to which this slot is connected emits a
  * value which causes `pred` to return true.
  */
-fun <T, S : T> Slot<T>.filtered(pred: (S) -> Boolean): Slot<S> =
-        { value -> if (pred(value)) this@filtered(value) }
+fun <T, S : T> Slot<T>.filtered(pred: (S) -> Boolean): Slot<S> = { value ->
+    if (pred(value)) this@filtered(value)
+}
 
 /**
  * Returns a new slot that invokes this slot and then evokes `after`.
  */
-fun <T, S : T> Slot<T>.andThen(after: Slot<S>): Slot<S> =
-        { event ->
-            this@andThen(event)
-            after(event)
-        }
+fun <T, S : T> Slot<T>.andThen(after: Slot<S>): Slot<S> = { event ->
+    this@andThen(event)
+    after(event)
+}
 
 /**
  * Allows a slot to be used as a {@link ValueView.Listener} by passing just the new value
  * through.
  */
-fun <T> Slot<T>.asValueViewListener(): ValueViewListener<T> =
-        { newValue, oldValue ->
-            this@asValueViewListener(newValue)
-        }
+fun <T> Slot<T>.asValueViewListener(): ValueViewListener<T> = { newValue, oldValue ->
+    this@asValueViewListener(newValue)
+}
