@@ -16,14 +16,10 @@
 
 package react
 
-import java.lang.AutoCloseable
-
 /**
- * An extension of [AutoCloseable] chiefly to eliminate the checked exception thrown by
- * [.close]. React resources generally do not encounter failure during closure, thus the
- * checked exception is a needless burden to pass on to callers.
+ * An interface for closeable resources. Has a single abstract method: [close].
  */
-interface Closeable : AutoCloseable {
+interface Closeable {
 
     /** Maintains a set of closeables to allow mass operations on them.  */
     class Set : Closeable {
@@ -48,18 +44,18 @@ interface Closeable : AutoCloseable {
         /** Adds the supplied connection to this set.
          * @return the supplied connection.
          */
-        fun <T : AutoCloseable> add(c: T): T {
-            if (_set == null) _set = HashSet<AutoCloseable>()
+        fun <T : Closeable> add(c: T): T {
+            if (_set == null) _set = HashSet<Closeable>()
             _set!!.add(c)
             return c
         }
 
         /** Removes a closeable from this set while leaving its status unchanged.  */
-        fun remove(c: AutoCloseable) {
+        fun remove(c: Closeable) {
             if (_set != null) _set!!.remove(c)
         }
 
-        protected var _set: HashSet<AutoCloseable>? = null // lazily created
+        protected var _set: HashSet<Closeable>? = null // lazily created
     }
 
     /** Provides some [Closeable]-related utilities.  */
@@ -108,5 +104,5 @@ interface Closeable : AutoCloseable {
     }
 
     /** Closes this closeable resource.  */
-    override fun close()
+    fun close()
 }
