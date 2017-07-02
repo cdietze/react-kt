@@ -17,24 +17,9 @@
 package react
 
 /**
- * TODO(cdi) commented out for now, migrate whatever makes sense to kotlin later
- * Provides utility methods for [Slot]s.
+ * Provides utility constants for [Slot]s.
  */
 object Slots {
     /** A slot that does nothing. Useful when you don't want to fiddle with null checks.  */
     val NOOP: UnitSlot = {}
-
-//    /**
-//     * Returns a slot that logs the supplied message (via [System.err]) with the emitted
-//     * value appended to it before passing the emitted value on to `slot`. Useful for
-//     * debugging.
-//     */
-//    fun <T> trace(message: String, slot: Slot<T>): Slot<T> {
-//        return object : Slot<T>() {
-//            override fun onEmit(value: T) {
-//                System.err.println(message + value)
-//                slot.onEmit(value)
-//            }
-//        }
-//    }
-}// no constructski
+}
