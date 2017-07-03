@@ -63,7 +63,7 @@ abstract class RFuture<out T> : Reactor() {
     val isComplete: ValueView<Boolean>
         get() {
             fun createCompleteView(): Value<Boolean> {
-                val isCompleteView = Value.create(false)
+                val isCompleteView = Value(false)
                 onComplete({ isCompleteView.update(true) })
                 _isCompleteView = isCompleteView
                 return isCompleteView

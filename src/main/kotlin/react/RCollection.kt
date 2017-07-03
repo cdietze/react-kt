@@ -30,7 +30,7 @@ abstract class RCollection<T> : Reactor() {
      */
     @Synchronized fun sizeView(): ValueView<Int> {
         if (_sizeView == null) {
-            _sizeView = Value.create(size)
+            _sizeView = Value(size)
         }
         return _sizeView!!
     }
