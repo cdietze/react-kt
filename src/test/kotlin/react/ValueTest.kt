@@ -242,24 +242,6 @@ class ValueTest {
         assertFalse(value.hasConnections())
     }
 
-    // TODO(cdi) revive test once we re-add `join`
-//    @Test fun testJoinedValue() {
-//        val number = Value.create(1)
-//        val string = Value.create("foo")
-//        val both = Values.INSTANCE.join(number, string)
-//        val counter = SignalTest.Counter()
-//        both.connect(counter)
-//        number.update(2)
-//        assertEquals(1, counter.notifies.toLong())
-//        assertEquals(Values.T2(2, "foo"), both.get())
-//        string.update("bar")
-//        assertEquals(2, counter.notifies.toLong())
-//        number.update(2)
-//        assertEquals(2, counter.notifies.toLong())
-//        string.update("bar")
-//        assertEquals(2, counter.notifies.toLong())
-//    }
-
     @Test fun testChanges() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
