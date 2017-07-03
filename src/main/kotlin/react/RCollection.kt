@@ -25,34 +25,34 @@ abstract class RCollection<T> : Reactor() {
      */
     abstract val size: Int get
 
+    private val sizeViewDelegate: Lazy<Value<Int>> = lazy {
+        Value(size)
+    }
+
     /**
      * Exposes the size of this collection as a value.
+     * Initialized lazily.
      */
-    @Synchronized fun sizeView(): ValueView<Int> {
-        if (_sizeView == null) {
-            _sizeView = Value(size)
-        }
-        return _sizeView!!
-    }
+    val sizeView: ValueView<Int> by sizeViewDelegate
 
     /**
      * Returns a reactive value which is true when this collection is empty, false otherwise.
      */
     val isEmptyView: ValueView<Boolean>
-        get() = sizeView().map({ it <= 0 })
+        get() = sizeView.map({ it <= 0 })
 
     /**
      * Returns a reactive value which is false when this collection is empty, true otherwise.
      */
     val isNonEmptyView: ValueView<Boolean>
-        get() = sizeView().map({ it > 0 })
+        get() = sizeView.map({ it > 0 })
 
     /**
      * Updates the reactive size value. The underlying collection need only call this method if it
      * changes the size of its collection *without* also calling [.notify].
      */
     protected fun updateSize() {
-        if (_sizeView != null) _sizeView!!.update(size)
+        if (sizeViewDelegate.isInitialized()) sizeViewDelegate.value.update(size)
     }
 
     override fun notify(notifier: Reactor.Notifier, a1: Any?, a2: Any?, a3: Any?) {
@@ -62,8 +62,4 @@ abstract class RCollection<T> : Reactor() {
             updateSize()
         }
     }
-
-    /** Used to expose the size of this set as a value. Initialized lazily.
-     * TODO(cdi) make this a lazy property */
-    private var _sizeView: Value<Int>? = null
 }

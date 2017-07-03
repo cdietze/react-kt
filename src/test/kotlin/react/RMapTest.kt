@@ -340,12 +340,12 @@ class RMapTest {
     fun testSizeView() {
         val map: RMap<String, Int> = RMap.create()
         map.put("one", 1)
-        assertEquals(1, map.sizeView().get().toInt().toLong())
+        assertEquals(1, map.sizeView.get().toInt().toLong())
         map.remove("one")
-        assertEquals(0, map.sizeView().get().toInt().toLong())
+        assertEquals(0, map.sizeView.get().toInt().toLong())
 
         val counter = SignalTest.Counter()
-        map.sizeView().connect(counter)
+        map.sizeView.connect(counter)
         map.put("two", 2)
         assertEquals(1, counter.notifies.toLong())
         map.put("three", 3)
