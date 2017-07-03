@@ -191,26 +191,24 @@ class ValueTest {
         assertEquals("Disconnecting before geting an update still disconnects", 3, fired[0].toLong())
     }
 
-    // TODO(cdi) re-add once [ValueView.disconnect(slot)] is re-added
-//    @Test fun testSlot() {
-//        val value = Value.create(42)
-//        val expectedValue = intArrayOf(value.get())
-//        val fired = intArrayOf(0)
-//        val listener = object : Slot<Int> {
-//            override fun invoke(newValue: Int) {
-//                assertEquals(expectedValue[0], newValue)
-//                fired[0] += 1
-//                value.disconnect(this)
-//            }
-//        }
-//        value.connect(listener)
-//        expectedValue[0] = 12; value.update(expectedValue[0])
-//        assertEquals("Calling disconnect with a slot disconnects", 1, fired[0])
-//
-//        // value.connect(listener).close()
-//        expectedValue[0] = 14; value.update(expectedValue[0])
-//        assertEquals(1, fired[0])
-//    }
+    @Test fun testSlot() {
+        val value = Value(42)
+        val expectedValue = intArrayOf(value.get())
+        val fired = intArrayOf(0)
+        val listener = object : Slot<Int> {
+            override fun invoke(newValue: Int) {
+                assertEquals(expectedValue[0], newValue)
+                fired[0] += 1
+            }
+        }
+        val con = value.connect(listener)
+        expectedValue[0] = 12; value.update(expectedValue[0])
+        assertEquals(1, fired[0])
+
+        con.close()
+        expectedValue[0] = 14; value.update(expectedValue[0])
+        assertEquals(1, fired[0])
+    }
 
     @Test fun testWeakListener() {
         val value = Value(42)
