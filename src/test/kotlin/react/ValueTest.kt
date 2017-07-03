@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class ValueTest {
     @Test fun testSimpleListener() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connect { nvalue: Int, ovalue: Int? ->
             assertEquals(42, ovalue!!.toInt().toLong())
@@ -38,7 +38,7 @@ class ValueTest {
     }
 
     @Test fun testAsSignal() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connect { value ->
             assertEquals(15, value.toLong())
@@ -49,7 +49,7 @@ class ValueTest {
     }
 
     @Test fun testAsOnceSignal() {
-        val value = Value.create(42)
+        val value = Value(42)
         val counter = SignalTest.Counter()
         value.connect(counter).once()
         value.update(15)
@@ -61,7 +61,7 @@ class ValueTest {
         // this ensures that our SignalListener -> ValueListener wrapping is working until we
         // switch to the Java 1.8-only approach which will combine those two interfaces into a
         // subtype relationship using a default method
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connect { value: Int ->
             assertEquals(15, value.toInt().toLong())
@@ -72,7 +72,7 @@ class ValueTest {
     }
 
     @Test fun testMappedValue() {
-        val value = Value.create(42)
+        val value = Value(42)
         val mapped = value.map(Int::toString)
 
         val counter = SignalTest.Counter()
@@ -93,9 +93,9 @@ class ValueTest {
     }
 
     @Test fun testFlatMappedValue() {
-        val value1 = Value.create(42)
-        val value2 = Value.create(24)
-        val toggle = Value.create(true)
+        val value1 = Value(42)
+        val value2 = Value(24)
+        val toggle = Value(true)
         val flatMapped = toggle.flatMap { toggle ->
             if (toggle) value1 else value2
         }
@@ -132,9 +132,9 @@ class ValueTest {
     }
 
     @Test fun testConnectionlessFlatMappedValue() {
-        val value1 = Value.create(42)
-        val value2 = Value.create(24)
-        val toggle = Value.create(true)
+        val value1 = Value(42)
+        val value2 = Value(24)
+        val toggle = Value(true)
         val flatMapped = toggle.flatMap { toggle ->
             if (toggle) value1 else value2
         }
@@ -144,7 +144,7 @@ class ValueTest {
     }
 
     @Test fun testConnectNotify() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connectNotify { value ->
             assertEquals(42, value.toInt().toLong())
@@ -154,7 +154,7 @@ class ValueTest {
     }
 
     @Test fun testListenNotify() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connectNotify { value ->
             assertEquals(42, value.toInt().toLong())
@@ -164,7 +164,7 @@ class ValueTest {
     }
 
     @Test fun testDisconnect() {
-        val value = Value.create(42)
+        val value = Value(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
         val listener: ValueViewListener<Int> = object : ValueViewListener<Int> {
@@ -213,7 +213,7 @@ class ValueTest {
 //    }
 
     @Test fun testWeakListener() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = AtomicInteger(0)
 
         var listener: ValueViewListener<Int>? = { value: Int, oldValue: Int? -> fired.incrementAndGet() }
@@ -263,7 +263,7 @@ class ValueTest {
 //    }
 
     @Test fun testChanges() {
-        val value = Value.create(42)
+        val value = Value(42)
         val fired = booleanArrayOf(false)
         value.changes().connect { v: Int ->
             assertEquals(15, v.toLong())
@@ -274,7 +274,7 @@ class ValueTest {
     }
 
     @Test fun testChangesNext() {
-        val value = Value.create(42)
+        val value = Value(42)
         val counter = SignalTest.Counter()
         value.changes().next().onSuccess(counter)
         value.update(15)

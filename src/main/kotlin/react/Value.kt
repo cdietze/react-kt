@@ -59,14 +59,4 @@ open class Value<T>
         _value = value
         return oldValue
     }
-
-    companion object {
-        /**
-         * Convenience method for creating an instance with the supplied starting value.
-         */
-        // TODO(cdi) remove eventually - Using the constructor is just as short
-        fun <T> create(value: T): Value<T> {
-            return Value(value)
-        }
-    }
 }
