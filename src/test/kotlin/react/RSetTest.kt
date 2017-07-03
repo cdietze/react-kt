@@ -153,12 +153,12 @@ class RSetTest {
     fun testSizeView() {
         val set: RSet<String> = RSet.create()
         set.add("one")
-        assertEquals(1, set.sizeView().get().toLong())
+        assertEquals(1, set.sizeView.get().toLong())
         set.remove("one")
-        assertEquals(0, set.sizeView().get().toLong())
+        assertEquals(0, set.sizeView.get().toLong())
 
         val counter = SignalTest.Counter()
-        set.sizeView().connect(counter)
+        set.sizeView.connect(counter)
         set.add("two")
         assertEquals(1, counter.notifies.toLong())
         set.add("three")

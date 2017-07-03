@@ -126,12 +126,12 @@ class RListTest {
     fun testSizeView() {
         val list: RList<String> = RList.create()
         list.add("one")
-        assertEquals(1, list.sizeView().get().toLong())
+        assertEquals(1, list.sizeView.get().toLong())
         list.remove("one")
-        assertEquals(0, list.sizeView().get().toLong())
+        assertEquals(0, list.sizeView.get().toLong())
 
         val counter = SignalTest.Counter()
-        list.sizeView().connect(counter)
+        list.sizeView.connect(counter)
         list.add("two")
         assertEquals(1, counter.notifies.toLong())
         list.add("three")
