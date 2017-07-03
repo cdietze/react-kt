@@ -59,17 +59,14 @@ abstract class RFuture<out T> : Reactor() {
         return this
     }
 
-    /** Returns a value that indicates whether this future has completed.  */
-    val isComplete: ValueView<Boolean>
-        get() {
-            fun createCompleteView(): Value<Boolean> {
-                val isCompleteView = Value(false)
-                onComplete({ isCompleteView.update(true) })
-                _isCompleteView = isCompleteView
-                return isCompleteView
-            }
-            return _isCompleteView ?: createCompleteView()
-        }
+    /** Returns a value that indicates whether this future has completed.
+     * Initialized lazily. */
+    val isComplete: ValueView<Boolean> by lazy {
+        println("CREATING new isComplete value")
+        val isCompleteView = Value(false)
+        onComplete({ isCompleteView.update(true) })
+        isCompleteView
+    }
 
     /** Returns whether this future is complete right now. This is an unfortunate name, but I
      * foolishly defined [.isComplete] to return a reactive view of completeness.  */
@@ -140,9 +137,6 @@ abstract class RFuture<out T> : Reactor() {
         /*@SuppressWarnings("unchecked")*/
         return Slots.NOOP
     }
-
-    // TODO(cdi) can we use a lazy property here?
-    private var _isCompleteView: ValueView<Boolean>? = null
 
     companion object {
 
