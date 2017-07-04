@@ -224,19 +224,18 @@ class SignalTest {
         assertEquals(1, triggered[0].toLong())
     }
 
-    //TODO(cdi) re-add after re-adding `filtered`
-//    @Test fun testFiltered() {
-//        val triggered = IntArray(1)
-//        val onString: Slot<String?> = { value ->
-//            assertFalse(value == null)
-//            triggered[0]++
-//        }
-//        val sig = Signal.create<String?>()
-//        sig.connect(onString.filtered(Functions.INSTANCE.getNON_NULL()))
-//        sig.emit(null)
-//        sig.emit("foozle")
-//        assertEquals(1, triggered[0].toLong())
-//    }
+    @Test fun testFiltered() {
+        val triggered = IntArray(1)
+        val onString: Slot<String?> = { value ->
+            assertFalse(value == null)
+            triggered[0]++
+        }
+        val sig = Signal.create<String?>()
+        sig.connect(onString.filtered({it != null}))
+        sig.emit(null)
+        sig.emit("foozle")
+        assertEquals(1, triggered[0].toLong())
+    }
 
     @Test fun testNext() {
         class Accum<T> : Slot<T> {
