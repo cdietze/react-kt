@@ -35,12 +35,4 @@ open class Signal<T> : AbstractSignal<T>() {
      */
     fun slot(): Slot<T> = this::emit
 
-    companion object {
-        /**
-         * Convenience method for creating a signal without repeating the type parameter.
-         */
-        fun <T> create(): Signal<T> {
-            return Signal()
-        }
-    }
 }
