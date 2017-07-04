@@ -33,7 +33,7 @@ class SignalTest {
     }
 
     @Test fun testSignalToSlot() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val slot = AccSlot<Int>()
         signal.connect(slot)
         signal.emit(1)
@@ -43,7 +43,7 @@ class SignalTest {
     }
 
     @Test fun testOneShotSlot() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val slot = AccSlot<Int>()
         signal.connect(slot).once()
         signal.emit(1) // slot should be removed after this emit
@@ -80,7 +80,7 @@ class SignalTest {
     }
 
     @Test fun testAddDuringDispatch() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val toAdd = AccSlot<Int>()
         signal.connect { signal.connect(toAdd) }.once()
 
@@ -94,7 +94,7 @@ class SignalTest {
     }
 
     @Test fun testRemoveDuringDispatch() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val toRemove = AccSlot<Int>()
         val rconn = signal.connect(toRemove)
 
@@ -116,7 +116,7 @@ class SignalTest {
     }
 
     @Test fun testAddAndRemoveDuringDispatch() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val toAdd = AccSlot<Int>()
         val toRemove = AccSlot<Int>()
         val rconn = signal.connect(toRemove)
@@ -144,7 +144,7 @@ class SignalTest {
     }
 
     @Test fun testDispatchDuringDispatch() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val counter = AccSlot<Int>()
         signal.connect(counter)
 
@@ -162,7 +162,7 @@ class SignalTest {
     }
 
     @Test fun testUnitSlot() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val fired = booleanArrayOf(false)
         signal.connect({
             fired[0] = true
@@ -193,7 +193,7 @@ class SignalTest {
     }
 
     @Test fun testMappedSignal() {
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val mapped = signal.map(Int::toString)
 
         val counter = Counter()
@@ -217,7 +217,7 @@ class SignalTest {
             assertFalse(value == null)
             triggered[0]++
         }
-        val sig = Signal.create<String?>()
+        val sig = Signal<String?>()
         sig.filter({ it != null }).connect(onString)
         sig.emit(null)
         sig.emit("foozle")
@@ -230,7 +230,7 @@ class SignalTest {
             assertFalse(value == null)
             triggered[0]++
         }
-        val sig = Signal.create<String?>()
+        val sig = Signal<String?>()
         sig.connect(onString.filtered({it != null}))
         sig.emit(null)
         sig.emit("foozle")
@@ -249,7 +249,7 @@ class SignalTest {
             }
         }
 
-        val signal = Signal.create<Int>()
+        val signal = Signal<Int>()
         val accum = Accum<Int>()
         val accum3 = Accum<Int>()
 
