@@ -267,7 +267,7 @@ class RFutureTest {
         val sucfailseq = RFuture.sequence(list(success1, failure1))
         sucfailseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
         }
         counter.bind(sucfailseq)
         counter.check("before seq succeed/fail", 0, 0, 0)
@@ -277,7 +277,7 @@ class RFutureTest {
         val failsucseq = RFuture.sequence(list(failure1, success2))
         failsucseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
         }
         counter.bind(failsucseq)
         counter.check("after seq fail/succeed", 0, 1, 1)
@@ -285,7 +285,7 @@ class RFutureTest {
         val fail2seq = RFuture.sequence(list(failure1, failure2))
         fail2seq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("2 failures: Exception: Boo 1!, Exception: Boo 2!",
+            assertEquals("2 failures: java.lang.Exception: Boo 1!, java.lang.Exception: Boo 2!",
                     cause.message)
         }
         counter.bind(fail2seq)
