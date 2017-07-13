@@ -33,7 +33,7 @@ class MultiFailureException : RuntimeException() {
             val buf = StringBuilder()
             for (failure in _failures) {
                 if (buf.length > 0) buf.append(", ")
-                buf.append(failure::class.simpleName).append(": ").append(failure.message)
+                buf.append(failure.toString())
             }
             return _failures.size.toString() + " failures: " + buf
         }
