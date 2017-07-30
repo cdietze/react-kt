@@ -25,11 +25,11 @@ import java.util.*
 class RSetTest {
     class Counter : RSet.Listener<Any>() {
         var notifies: Int = 0
-        override fun onAdd(elem: Any?) {
+        override fun onAdd(elem: Any) {
             notifies++
         }
 
-        override fun onRemove(elem: Any?) {
+        override fun onRemove(elem: Any) {
             notifies++
         }
     }
@@ -176,7 +176,7 @@ class RSetTest {
 
         protected fun <T> requireAdd(reqElem: T): RSet.Listener<T> {
             return object : RSet.Listener<T>() {
-                override fun onAdd(elem: T?) {
+                override fun onAdd(elem: T) {
                     assertEquals(reqElem, elem)
                 }
             }
@@ -184,7 +184,7 @@ class RSetTest {
 
         protected fun <T> requireRemove(reqElem: T): RSet.Listener<T> {
             return object : RSet.Listener<T>() {
-                override fun onRemove(elem: T?) {
+                override fun onRemove(elem: T) {
                     assertEquals(reqElem, elem)
                 }
             }

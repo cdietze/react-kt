@@ -21,15 +21,15 @@ import org.junit.Test
 class RListTest {
     class Counter : RList.Listener<Any>() {
         var notifies: Int = 0
-        override fun onAdd(index: Int, elem: Any?) {
+        override fun onAdd(index: Int, elem: Any) {
             notifies++
         }
 
-        override fun onSet(index: Int, newElem: Any?, oldElem: Any?) {
+        override fun onSet(index: Int, newElem: Any, oldElem: Any?) {
             notifies++
         }
 
-        override fun onRemove(index: Int, elem: Any?) {
+        override fun onRemove(index: Int, elem: Any) {
             notifies++
         }
     }
@@ -76,7 +76,7 @@ class RListTest {
         list.connect(counter)
 
         list.connect(object : RList.Listener<String>() {
-            override fun onSet(index: Int, newElem: String?, oldElem: String?) {
+            override fun onSet(index: Int, newElem: String, oldElem: String?) {
                 assertEquals(1, index.toLong())
                 assertEquals("2", oldElem)
                 assertEquals("3", newElem)
@@ -104,7 +104,7 @@ class RListTest {
         // setting the last next call makes one set notification
         literator.next()
         list.connect(object : RList.Listener<String>() {
-            override fun onSet(index: Int, newElem: String?, oldElem: String?) {
+            override fun onSet(index: Int, newElem: String, oldElem: String?) {
                 assertEquals(0, index.toLong())
                 assertEquals("2", oldElem)
                 assertEquals("3", newElem)
@@ -144,7 +144,7 @@ class RListTest {
 
         fun <T> requireAdd(reqElem: T): RList.Listener<T> {
             return object : RList.Listener<T>() {
-                override fun onAdd(elem: T?) {
+                override fun onAdd(elem: T) {
                     assertEquals(reqElem, elem)
                 }
             }
@@ -152,7 +152,7 @@ class RListTest {
 
         fun <T> requireRemove(reqElem: T): RList.Listener<T> {
             return object : RList.Listener<T>() {
-                override fun onRemove(elem: T?) {
+                override fun onRemove(elem: T) {
                     assertEquals(reqElem, elem)
                 }
             }

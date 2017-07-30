@@ -30,12 +30,12 @@ class RSet<E>
     /** An interface for publishing set events to listeners.  */
     abstract class Listener<E> : RListener() {
         /** Notifies listener of an added element.  */
-        open fun onAdd(elem: E?) {
+        open fun onAdd(elem: E) {
             // noop
         }
 
         /** Notifies listener of a removed element.  */
-        open fun onRemove(elem: E?) {
+        open fun onRemove(elem: E) {
             // noop
         }
     }
@@ -102,11 +102,11 @@ class RSet<E>
 
             override fun connect(): Connection {
                 return this@RSet.connect(object : RSet.Listener<E>() {
-                    override fun onAdd(aelem: E?) {
+                    override fun onAdd(aelem: E) {
                         if (elem == aelem) notifyChange(true, false)
                     }
 
-                    override fun onRemove(relem: E?) {
+                    override fun onRemove(relem: E) {
                         if (elem == relem) notifyChange(false, true)
                     }
                 })
@@ -271,13 +271,13 @@ class RSet<E>
 
         protected val ADD: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, elem: Any?, _1: Any?, _2: Any?) {
-                (lner as Listener<Any>).onAdd(elem)
+                (lner as Listener<Any>).onAdd(elem!!)
             }
         }
 
         protected val REMOVE: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, elem: Any?, _1: Any?, _2: Any?) {
-                (lner as Listener<Any>).onRemove(elem)
+                (lner as Listener<Any>).onRemove(elem!!)
             }
         }
     }

@@ -31,34 +31,34 @@ class RList<E>
     abstract class Listener<E> {
         /** Notifies listener of an added element. This method will call the index-forgetting
          * version ([.onAdd]) by default.  */
-        open fun onAdd(index: Int, elem: E?) {
+        open fun onAdd(index: Int, elem: E) {
             onAdd(elem)
         }
 
         /** Notifies listener of an added element.  */
-        open fun onAdd(elem: E?) {
+        open fun onAdd(elem: E) {
             // noop
         }
 
         /** Notifies listener of an updated element. This method will call the old-value-forgetting
          * version ([.onSet]) by default.  */
-        open fun onSet(index: Int, newElem: E?, oldElem: E?) {
+        open fun onSet(index: Int, newElem: E, oldElem: E?) {
             onSet(index, newElem)
         }
 
         /** Notifies listener of an updated element.  */
-        open fun onSet(index: Int, newElem: E?) {
+        open fun onSet(index: Int, newElem: E) {
             // noop
         }
 
         /** Notifies listener of a removed element. This method will call the index-forgetting
          * version ([.onRemove]) by default.  */
-        open fun onRemove(index: Int, elem: E?) {
+        open fun onRemove(index: Int, elem: E) {
             onRemove(elem)
         }
 
         /** Notifies listener of a removed element.  */
-        open fun onRemove(elem: E?) {
+        open fun onRemove(elem: E) {
             // noop
         }
     }
@@ -327,19 +327,19 @@ class RList<E>
 
         protected val ADD: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, index: Any?, elem: Any?, ignored: Any?) {
-                (lner as Listener<Any>).onAdd((index as Int?)!!, elem)
+                (lner as Listener<Any>).onAdd((index as Int?)!!, elem!!)
             }
         }
 
         protected val SET: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, index: Any?, newElem: Any?, oldElem: Any?) {
-                (lner as Listener<Any>).onSet((index as Int?)!!, newElem, oldElem)
+                (lner as Listener<Any>).onSet((index as Int?)!!, newElem!!, oldElem)
             }
         }
 
         protected val REMOVE: Reactor.Notifier = object : Reactor.Notifier() {
             override fun notify(lner: Any, index: Any?, elem: Any?, ignored: Any?) {
-                (lner as Listener<Any>).onRemove((index as Int?)!!, elem)
+                (lner as Listener<Any>).onRemove((index as Int?)!!, elem!!)
             }
         }
     }
