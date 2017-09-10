@@ -40,7 +40,7 @@ interface SignalView<T> {
     /**
      * Returns a future that is completed with the next value from this signal.
      */
-    operator fun next(): RFuture<T>
+    fun next(): RFuture<T>
 
     /**
      * Connects this signal to the supplied slot, such that when an event is emitted from this
