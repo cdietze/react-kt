@@ -16,7 +16,7 @@
 
 package react
 
-import org.junit.Assert.assertEquals
+import kotlin.test.assertEquals
 
 object TestBase {
 
@@ -30,7 +30,7 @@ object TestBase {
         }
 
         fun assertTriggered(message: String, count: Int) {
-            assertEquals(message, count.toLong(), _count.toLong())
+            assertEquals(count.toLong(), _count.toLong(), message)
         }
 
         fun reset() {

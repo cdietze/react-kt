@@ -1,7 +1,7 @@
 package react
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 /**
  * Tests aspects of the [Values] object.

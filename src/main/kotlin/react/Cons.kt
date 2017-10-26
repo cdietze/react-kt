@@ -16,8 +16,6 @@
 
 package react
 
-import java.lang.ref.WeakReference
-
 /**
  * Implements [Connection] and a linked-list style listener list for [Reactor]s.
  */

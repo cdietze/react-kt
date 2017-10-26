@@ -15,9 +15,10 @@
  */
 package react
 
-import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests aspects of the [RSet] class.
@@ -78,7 +79,7 @@ class RSetTest {
         set.connect(counter)
 
         // test adding multiple entries
-        set.addAll(Arrays.asList(1, 2, 3, 4))
+        set.addAll(listOf(1, 2, 3, 4))
         assertEquals(4, counter.notifies.toLong())
 
         // test removing by iterator
@@ -91,12 +92,12 @@ class RSetTest {
         val v2 = iter.next()
 
         // test notification on remove all
-        set.removeAll(Arrays.asList(v1, 5, 6))
+        set.removeAll(listOf(v1, 5, 6))
         assertEquals(6, counter.notifies.toLong())
         assertEquals(2, set.size.toLong())
 
         // test notification on retain all
-        set.retainAll(Arrays.asList(v2, 7, 8))
+        set.retainAll(listOf(v2, 7, 8))
         assertEquals(7, counter.notifies.toLong())
         assertEquals(1, set.size.toLong())
 
