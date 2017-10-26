@@ -93,8 +93,7 @@ class RSet<E>
      * value will report a change when the specified element is added or removed. Note that [ ][.addForce] or [.removeForce] will cause this view to trigger and incorrectly report
      * that the element was not or was previously contained in the set. Caveat user.
      */
-    fun containsView(elem: E?): ValueView<Boolean> {
-        if (elem == null) throw NullPointerException("Must supply non-null 'elem'.")
+    fun containsView(elem: E): ValueView<Boolean> {
         return object : MappedValue<Boolean>() {
             override fun get(): Boolean {
                 return contains(elem)

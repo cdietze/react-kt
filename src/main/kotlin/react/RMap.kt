@@ -126,8 +126,7 @@ class RMap<K, V>
      * this view only works on maps that *do not* contain mappings to `null`. The view
      * will retain a connection to this map for as long as it has connections of its own.
      */
-    fun containsKeyView(key: K?): ValueView<Boolean> {
-        if (key == null) throw NullPointerException("Must supply non-null 'key'.")
+    fun containsKeyView(key: K): ValueView<Boolean> {
         return object : MappedValue<Boolean>() {
             override fun get(): Boolean {
                 return containsKey(key)
@@ -152,8 +151,7 @@ class RMap<K, V>
      * report a change when the mapping for the specified key is changed or removed. The view will
      * retain a connection to this map for as long as it has connections of its own.
      */
-    fun getView(key: K?): ValueView<V?> {
-        if (key == null) throw NullPointerException("Must supply non-null 'key'.")
+    fun getView(key: K): ValueView<V?> {
         return object : MappedValue<V?>() {
             override fun get(): V? {
                 return this@RMap[key]

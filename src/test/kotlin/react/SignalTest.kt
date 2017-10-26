@@ -16,9 +16,8 @@
 
 package react
 
-import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import kotlin.test.*
 
 /**
  * Tests basic signals and slots behavior.
@@ -32,27 +31,30 @@ class SignalTest {
         }
     }
 
-    @Test fun testSignalToSlot() {
+    @Test
+    fun testSignalToSlot() {
         val signal = Signal<Int>()
         val slot = AccSlot<Int>()
         signal.connect(slot)
         signal.emit(1)
         signal.emit(2)
         signal.emit(3)
-        assertEquals(Arrays.asList(1, 2, 3), slot.events)
+        assertEquals(listOf(1, 2, 3), slot.events)
     }
 
-    @Test fun testOneShotSlot() {
+    @Test
+    fun testOneShotSlot() {
         val signal = Signal<Int>()
         val slot = AccSlot<Int>()
         signal.connect(slot).once()
         signal.emit(1) // slot should be removed after this emit
         signal.emit(2)
         signal.emit(3)
-        assertEquals(Arrays.asList(1), slot.events)
+        assertEquals(listOf(1), slot.events)
     }
 
-    @Test fun testSlotPriority() {
+    @Test
+    fun testSlotPriority() {
         val counter = intArrayOf(0)
 
         class TestSlot : UnitSlot {
@@ -79,7 +81,8 @@ class SignalTest {
         assertEquals(4, slot4.order.toLong())
     }
 
-    @Test fun testAddDuringDispatch() {
+    @Test
+    fun testAddDuringDispatch() {
         val signal = Signal<Int>()
         val toAdd = AccSlot<Int>()
         signal.connect { signal.connect(toAdd) }.once()
@@ -90,17 +93,18 @@ class SignalTest {
 
         // now dispatch an event that should go to the added signal
         signal.emit(42)
-        assertEquals(Arrays.asList(42), toAdd.events)
+        assertEquals(listOf(42), toAdd.events)
     }
 
-    @Test fun testRemoveDuringDispatch() {
+    @Test
+    fun testRemoveDuringDispatch() {
         val signal = Signal<Int>()
         val toRemove = AccSlot<Int>()
         val rconn = signal.connect(toRemove)
 
         // dispatch one event and make sure it's received
         signal.emit(5)
-        assertEquals(Arrays.asList(5), toRemove.events)
+        assertEquals(listOf(5), toRemove.events)
 
         // now add our removing signal, and dispatch again
         signal.connect({
@@ -109,13 +113,14 @@ class SignalTest {
         signal.emit(42)
         // since toRemove will have been removed during this dispatch, it will not receive the
         // signal in question, because the higher priority signal triggered first and removed it
-        assertEquals(Arrays.asList(5), toRemove.events)
+        assertEquals(listOf(5), toRemove.events)
         // finally dispatch one more event and make sure toRemove didn't get it
         signal.emit(9)
-        assertEquals(Arrays.asList(5), toRemove.events)
+        assertEquals(listOf(5), toRemove.events)
     }
 
-    @Test fun testAddAndRemoveDuringDispatch() {
+    @Test
+    fun testAddAndRemoveDuringDispatch() {
         val signal = Signal<Int>()
         val toAdd = AccSlot<Int>()
         val toRemove = AccSlot<Int>()
@@ -123,7 +128,7 @@ class SignalTest {
 
         // dispatch one event and make sure it's received by toRemove
         signal.emit(5)
-        assertEquals(Arrays.asList(5), toRemove.events)
+        assertEquals(listOf(5), toRemove.events)
 
         // now add our adder/remover signal, and dispatch again
         signal.connect({
@@ -134,16 +139,17 @@ class SignalTest {
 
         // make sure toRemove got this event (in this case the adder/remover signal fires *after*
         // toRemove gets the event) and toAdd didn't
-        assertEquals(Arrays.asList(5, 42), toRemove.events)
+        assertEquals(listOf(5, 42), toRemove.events)
         assertEquals(0, toAdd.events.size.toLong())
 
         // finally emit one more and ensure that toAdd got it and toRemove didn't
         signal.emit(9)
-        assertEquals(Arrays.asList(9), toAdd.events)
-        assertEquals(Arrays.asList(5, 42), toRemove.events)
+        assertEquals(listOf(9), toAdd.events)
+        assertEquals(listOf(5, 42), toRemove.events)
     }
 
-    @Test fun testDispatchDuringDispatch() {
+    @Test
+    fun testDispatchDuringDispatch() {
         val signal = Signal<Int>()
         val counter = AccSlot<Int>()
         signal.connect(counter)
@@ -158,10 +164,11 @@ class SignalTest {
 
         // dispatch one event and make sure that both events are received
         signal.emit(5)
-        assertEquals(Arrays.asList(5, 10), counter.events)
+        assertEquals(listOf(5, 10), counter.events)
     }
 
-    @Test fun testUnitSlot() {
+    @Test
+    fun testUnitSlot() {
         val signal = Signal<Int>()
         val fired = booleanArrayOf(false)
         signal.connect({
@@ -171,16 +178,18 @@ class SignalTest {
         assertTrue(fired[0])
     }
 
-    @Test(expected = RuntimeException::class)
+    @Test
     fun testSingleFailure() {
         val signal = UnitSignal()
         signal.connect({
             throw RuntimeException("Bang!")
         })
-        signal.emit()
+        assertFailsWith(RuntimeException::class) {
+            signal.emit()
+        }
     }
 
-    @Test(expected = RuntimeException::class)
+    @Test
     fun testMultiFailure() {
         val signal = UnitSignal()
         signal.connect({
@@ -189,10 +198,13 @@ class SignalTest {
         signal.connect({
             throw RuntimeException("Bang!")
         })
-        signal.emit()
+        assertFailsWith(RuntimeException::class) {
+            signal.emit()
+        }
     }
 
-    @Test fun testMappedSignal() {
+    @Test
+    fun testMappedSignal() {
         val signal = Signal<Int>()
         val mapped = signal.map(Int::toString)
 
@@ -211,7 +223,8 @@ class SignalTest {
         assertFalse(signal.hasConnections())
     }
 
-    @Test fun testFilter() {
+    @Test
+    fun testFilter() {
         val triggered = IntArray(1)
         val onString: Slot<String?> = { value ->
             assertFalse(value == null)
@@ -224,20 +237,22 @@ class SignalTest {
         assertEquals(1, triggered[0].toLong())
     }
 
-    @Test fun testFiltered() {
+    @Test
+    fun testFiltered() {
         val triggered = IntArray(1)
         val onString: Slot<String?> = { value ->
             assertFalse(value == null)
             triggered[0]++
         }
         val sig = Signal<String?>()
-        sig.connect(onString.filtered({it != null}))
+        sig.connect(onString.filtered({ it != null }))
         sig.emit(null)
         sig.emit("foozle")
         assertEquals(1, triggered[0].toLong())
     }
 
-    @Test fun testNext() {
+    @Test
+    fun testNext() {
         class Accum<T> : Slot<T> {
             var values: MutableList<T> = ArrayList()
             override fun invoke(value: T) {
@@ -257,8 +272,8 @@ class SignalTest {
         signal.filter({ it == 3 }).next().onSuccess(accum3)
 
         val NONE = emptyList<Int>()
-        val ONE = Arrays.asList(1)
-        val THREE = Arrays.asList(3)
+        val ONE = listOf(1)
+        val THREE = listOf(3)
 
         signal.emit(1) // adder should only receive this value
         accum.assertContains(ONE)
@@ -276,7 +291,7 @@ class SignalTest {
         assertFalse(signal.hasConnections())
 
         signal.emit(3) // adder3 should not receive multiple threes
-        accum3.assertContains(Arrays.asList(3))
+        accum3.assertContains(listOf(3))
     }
 
     protected class AccSlot<T> : Slot<T> {

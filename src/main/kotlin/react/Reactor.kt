@@ -39,64 +39,73 @@ abstract class Reactor {
 
      * @throws IllegalStateException if this reactor is in the middle of dispatching an event.
      */
-    @Synchronized fun clearConnections() {
-        if (isDispatching)
-            throw IllegalStateException(
-                    "Cannot clear connections while dispatching.")
-        if (_pendingRuns != null)
-            throw IllegalStateException("Cannot clear connections while running.")
-        _listeners = null
+    fun clearConnections() {
+        synchronized(this) {
+            if (isDispatching)
+                throw IllegalStateException(
+                        "Cannot clear connections while dispatching.")
+            if (_pendingRuns != null)
+                throw IllegalStateException("Cannot clear connections while running.")
+            _listeners = null
+        }
     }
 
     /** Returns the listener to be used when a weakly held listener is discovered to have been
      * collected while dispatching. This listener should NOOP when signaled.  */
     internal abstract fun placeholderListener(): RListener
 
-    @Synchronized fun addConnection(listener: RListener?): Cons {
-        if (listener == null) throw NullPointerException("Null listener")
-        return addCons(Cons(this, listener))
-    }
-
-    @Synchronized fun addCons(cons: Cons): Cons {
-        if (isDispatching) {
-            _pendingRuns = append(_pendingRuns, object : Runs() {
-                override fun run() {
-                    _listeners = Cons.insert(_listeners, cons)
-                    connectionAdded()
-                }
-            })
-        } else {
-            _listeners = Cons.insert(_listeners, cons)
-            connectionAdded()
-        }
-        return cons
-    }
-
-    @Synchronized fun disconnect(cons: Cons) {
-        if (isDispatching) {
-            _pendingRuns = append(_pendingRuns, object : Runs() {
-                override fun run() {
-                    _listeners = Cons.remove(_listeners, cons)
-                    connectionRemoved()
-                }
-            })
-        } else {
-            _listeners = Cons.remove(_listeners, cons)
-            connectionRemoved()
+    fun addConnection(listener: RListener): Cons {
+        synchronized(this) {
+            return addCons(Cons(this, listener))
         }
     }
 
-    @Synchronized protected fun removeConnection(listener: RListener) {
-        if (isDispatching) {
-            _pendingRuns = append(_pendingRuns, object : Runs() {
-                override fun run() {
-                    _listeners = Cons.removeAll(_listeners, listener)
-                    connectionRemoved()
-                }
-            })
-        } else {
-            _listeners = Cons.removeAll(_listeners, listener)
-            connectionRemoved()
+    fun addCons(cons: Cons): Cons {
+        synchronized(this) {
+            if (isDispatching) {
+                _pendingRuns = append(_pendingRuns, object : Runs() {
+                    override fun run() {
+                        _listeners = Cons.insert(_listeners, cons)
+                        connectionAdded()
+                    }
+                })
+            } else {
+                _listeners = Cons.insert(_listeners, cons)
+                connectionAdded()
+            }
+            return cons
+        }
+    }
+
+    fun disconnect(cons: Cons) {
+        synchronized(this) {
+            if (isDispatching) {
+                _pendingRuns = append(_pendingRuns, object : Runs() {
+                    override fun run() {
+                        _listeners = Cons.remove(_listeners, cons)
+                        connectionRemoved()
+                    }
+                })
+            } else {
+                _listeners = Cons.remove(_listeners, cons)
+                connectionRemoved()
+            }
+        }
+    }
+
+    protected fun removeConnection(listener: RListener) {
+        synchronized(this) {
+            if (isDispatching) {
+                _pendingRuns = append(_pendingRuns, object : Runs() {
+                    override fun run() {
+                        _listeners = Cons.removeAll(_listeners, listener)
+                        connectionRemoved()
+                    }
+                })
+            } else {
+                _listeners = Cons.removeAll(_listeners, listener)
+                connectionRemoved()
+            }
         }
     }
 
@@ -186,10 +195,12 @@ abstract class Reactor {
         if (exn != null) throw exn
     }
 
-    @Synchronized private fun nextRun(): Runs? {
-        val run = _pendingRuns
-        if (run != null) _pendingRuns = run.next
-        return run
+    private fun nextRun(): Runs? {
+        synchronized(this) {
+            val run = _pendingRuns
+            if (run != null) _pendingRuns = run.next
+            return run
+        }
     }
 
     // always called while lock is held on this reactor

@@ -1,7 +1,7 @@
 package react
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class CloseableTest {
     class Counter : Closeable {

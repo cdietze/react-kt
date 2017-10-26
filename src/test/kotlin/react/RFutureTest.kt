@@ -16,9 +16,10 @@
 
 package react
 
-import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RFutureTest {
 
@@ -47,7 +48,8 @@ class RFutureTest {
         }
     }
 
-    @Test fun testImmediate() {
+    @Test
+    fun testImmediate() {
         val counter = FutureCounter()
 
         val success = RFuture.success("Yay!")
@@ -59,7 +61,8 @@ class RFutureTest {
         counter.check("immediate failure", 0, 1, 1)
     }
 
-    @Test fun testDeferred() {
+    @Test
+    fun testDeferred() {
         val counter = FutureCounter()
 
         val success = RPromise.create<String>()
@@ -78,7 +81,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testMappedImmediate() {
+    @Test
+    fun testMappedImmediate() {
         val counter = FutureCounter()
 
         val success: RFuture<String?> = RFuture.success("Yay!")
@@ -90,7 +94,8 @@ class RFutureTest {
         counter.check("immediate failure", 0, 1, 1)
     }
 
-    @Test fun testMappedDeferred() {
+    @Test
+    fun testMappedDeferred() {
         val counter = FutureCounter()
 
         val success = RPromise.create<String?>()
@@ -109,7 +114,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testFlatMappedImmediate() {
+    @Test
+    fun testFlatMappedImmediate() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
         val ccounter = FutureCounter()
@@ -140,7 +146,8 @@ class RFutureTest {
         ccounter.check("immediate failure/crash", 0, 1, 1)
     }
 
-    @Test fun testFlatMappedDeferred() {
+    @Test
+    fun testFlatMappedDeferred() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
         val successMap: (String) -> RFuture<Boolean> = { _ ->
@@ -171,7 +178,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testFlatMappedDoubleDeferred() {
+    @Test
+    fun testFlatMappedDoubleDeferred() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
 
@@ -220,7 +228,8 @@ class RFutureTest {
         }
     }
 
-    @Test fun testSequenceImmediate() {
+    @Test
+    fun testSequenceImmediate() {
         val counter = FutureCounter()
 
         val success1 = RFuture.success("Yay 1!")
@@ -246,7 +255,8 @@ class RFutureTest {
         counter.check("immediate seq failure/failure", 0, 1, 1)
     }
 
-    @Test fun testSequenceDeferred() {
+    @Test
+    fun testSequenceDeferred() {
         val counter = FutureCounter()
 
         val success1 = RPromise.create<String>()
@@ -294,14 +304,16 @@ class RFutureTest {
         counter.check("after seq fail/fail", 0, 1, 1)
     }
 
-    @Test fun testSequenceEmpty() {
+    @Test
+    fun testSequenceEmpty() {
         val counter = FutureCounter()
         val seq = RFuture.sequence(emptyList<RFuture<String>>())
         counter.bind(seq)
         counter.check("sequence empty list succeeds", 1, 0, 1)
     }
 
-    @Test fun testSequenceTuple() {
+    @Test
+    fun testSequenceTuple() {
         val counter = FutureCounter()
         val string = RFuture.success("string")
         val integer = RFuture.success(42)
@@ -324,7 +336,8 @@ class RFutureTest {
         counter.check("tuple2 seq fail/success", 0, 1, 1)
     }
 
-    @Test fun testCollectEmpty() {
+    @Test
+    fun testCollectEmpty() {
         val counter = FutureCounter()
         val seq = RFuture.collect(emptyList<RFuture<String>>())
         counter.bind(seq)

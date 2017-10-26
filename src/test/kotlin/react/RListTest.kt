@@ -15,8 +15,8 @@
  */
 package react
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class RListTest {
     class Counter : RList.Listener<Any>() {
