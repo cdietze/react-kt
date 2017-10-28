@@ -114,9 +114,10 @@ class RSet<E>
     }
 
     // from interface Set<E>
-    override val size: Int get() {
-        return _impl.size
-    }
+    override val size: Int
+        get() {
+            return _impl.size
+        }
 
     // from interface Set<E>
     override fun isEmpty(): Boolean {
@@ -154,7 +155,10 @@ class RSet<E>
     override fun addAll(coll: Collection<E>): Boolean {
         var modified = false
         for (elem in coll) {
-            modified = modified or add(elem)
+            // Cannot inline this because it would short-circuit in JS-backend, see
+            // https://discuss.kotlinlang.org/t/boolean-operations-in-js-backend-do-perform-short-circuit/5157
+            val r = add(elem)
+            modified = modified or r
         }
         return modified
     }
@@ -177,7 +181,10 @@ class RSet<E>
         var modified = false
         val iter = coll.iterator()
         while (iter.hasNext()) {
-            modified = modified or remove(iter.next())
+            // Cannot inline this because it would short-circuit in JS-backend, see
+            // https://discuss.kotlinlang.org/t/boolean-operations-in-js-backend-do-perform-short-circuit/5157
+            val r = remove(iter.next())
+            modified = modified or r
         }
         return modified
     }

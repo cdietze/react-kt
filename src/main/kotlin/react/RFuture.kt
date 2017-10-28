@@ -62,7 +62,6 @@ abstract class RFuture<out T> : Reactor() {
     /** Returns a value that indicates whether this future has completed.
      * Initialized lazily. */
     val isComplete: ValueView<Boolean> by lazy {
-        println("CREATING new isComplete value")
         val isCompleteView = Value(false)
         onComplete({ isCompleteView.update(true) })
         isCompleteView

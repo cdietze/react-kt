@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 
 object TestBase {
 
-    class Counter : Slot<Any?> {
+    class Counter {
         fun trigger() {
             _count++
         }
@@ -37,9 +37,7 @@ object TestBase {
             _count = 0
         }
 
-        override fun invoke(value: Any?) {
-            trigger()
-        }
+        val slot: UnitSlot = fun(_: Any?) { trigger() }
 
         private var _count: Int = 0
     }

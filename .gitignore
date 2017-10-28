@@ -3,3 +3,4 @@
 .settings/
 target
 /bazel-*
+react-kt-js/node_modules

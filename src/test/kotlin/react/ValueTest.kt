@@ -55,7 +55,7 @@ class ValueTest {
     fun testAsOnceSignal() {
         val value = Value(42)
         val counter = SignalTest.Counter()
-        value.connect(counter).once()
+        value.connect(counter.slot).once()
         value.update(15)
         value.update(42)
         assertEquals(1, counter.notifies.toLong())
@@ -82,7 +82,7 @@ class ValueTest {
         val mapped = value.map(Int::toString)
 
         val counter = SignalTest.Counter()
-        val c1 = mapped.connect(counter)
+        val c1 = mapped.connect(counter.slot)
         val c2 = mapped.connect(SignalTest.require("15"))
 
         value.update(15)
@@ -110,9 +110,9 @@ class ValueTest {
         val counter1 = SignalTest.Counter()
         val counter2 = SignalTest.Counter()
         val counterM = SignalTest.Counter()
-        val c1 = value1.connect(counter1)
-        val c2 = value2.connect(counter2)
-        val cM = flatMapped.connect(counterM)
+        val c1 = value1.connect(counter1.slot)
+        val c2 = value2.connect(counter2.slot)
+        val cM = flatMapped.connect(counterM.slot)
 
         flatMapped.connect(SignalTest.require(10)).once()
         value1.update(10)
@@ -178,20 +178,25 @@ class ValueTest {
         val value = Value(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
-        val listener: ValueViewListener<Int> = object : ValueViewListener<Int> {
-            override fun invoke(newValue: Int, oldValue: Int?) {
-                assertEquals(expectedValue[0].toLong(), newValue.toInt().toLong())
-                fired[0] += 1
-                value.disconnect(this)
-            }
+
+        // Forward reference that we can use inside the function to reference itself
+        var listener: ValueViewListener<Int>? = null
+
+        val listenerImpl: ValueViewListener<Int> = fun(newValue: Int, oldValue: Int?) {
+            assertEquals(expectedValue[0].toLong(), newValue.toInt().toLong())
+            fired[0] += 1
+            value.disconnect(listener!!)
         }
+
+        listener = listenerImpl
+
         val conn = value.connectNotify(listener)
         expectedValue[0] = 12; value.update(expectedValue[0])
-        assertEquals(1, fired[0].toLong(), "Disconnecting in listenNotify disconnects")
+        assertEquals(1, fired[0], "Disconnecting in listenNotify disconnects")
         conn.close()// Just see what happens when calling disconnect while disconnected
 
         value.connect(listener)
-        value.connect(SignalTest.Counter())
+        value.connect(SignalTest.Counter().slot)
         value.connect(listener)
         expectedValue[0] = 13; value.update(expectedValue[0])
         expectedValue[0] = 14; value.update(expectedValue[0])
@@ -199,7 +204,7 @@ class ValueTest {
 
         value.connect(listener).close()
         expectedValue[0] = 15; value.update(expectedValue[0])
-        assertEquals(3, fired[0].toLong(), "Disconnecting before geting an update still disconnects")
+        assertEquals(3, fired[0].toLong(), "Disconnecting before getting an update still disconnects")
     }
 
     @Test
@@ -207,11 +212,9 @@ class ValueTest {
         val value = Value(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
-        val listener = object : Slot<Int> {
-            override fun invoke(newValue: Int) {
-                assertEquals(expectedValue[0], newValue)
-                fired[0] += 1
-            }
+        val listener: Slot<Int> = fun(newValue: Int) {
+            assertEquals(expectedValue[0], newValue)
+            fired[0] += 1
         }
         val con = value.connect(listener)
         expectedValue[0] = 12; value.update(expectedValue[0])
@@ -220,37 +223,6 @@ class ValueTest {
         con.close()
         expectedValue[0] = 14; value.update(expectedValue[0])
         assertEquals(1, fired[0])
-    }
-
-    @Test
-    fun testWeakListener() {
-        val value = Value(42)
-        var fired = 0
-
-        var listener: ValueViewListener<Int>? = { value: Int, oldValue: Int? ->
-            fired += 1
-        }
-        triggerSystemGc()
-
-        val conn = value.addConnection(listener!!)
-        value.update(41)
-        assertEquals(1, fired)
-        assertTrue(value.hasConnections())
-
-        // make sure that calling holdWeakly twice doesn't cause weirdness
-        conn.holdWeakly()
-        value.update(42)
-        assertEquals(2, fired)
-        assertTrue(value.hasConnections())
-
-        // clear out the listener and do our best to convince the JVM to collect it
-        listener = null
-        triggerSystemGc()
-
-        // now check that the listener has been collected and is not notified
-        value.update(40)
-        assertEquals(2, fired)
-        assertFalse(value.hasConnections())
     }
 
     @Test
@@ -269,7 +241,7 @@ class ValueTest {
     fun testChangesNext() {
         val value = Value(42)
         val counter = SignalTest.Counter()
-        value.changes().next().onSuccess(counter)
+        value.changes().next().onSuccess(counter.slot)
         value.update(15)
         value.update(42)
         assertEquals(1, counter.notifies.toLong())

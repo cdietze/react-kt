@@ -30,9 +30,9 @@ class RFutureTest {
 
         fun bind(future: RFuture<*>) {
             reset()
-            future.onSuccess(successes)
-            future.onFailure(failures)
-            future.onComplete(completes)
+            future.onSuccess(successes.slot)
+            future.onFailure(failures.slot)
+            future.onComplete(completes.slot)
         }
 
         fun check(state: String, scount: Int, fcount: Int, ccount: Int) {
@@ -277,17 +277,17 @@ class RFutureTest {
         val sucfailseq = RFuture.sequence(list(success1, failure1))
         sucfailseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: SomeException: Boo 1!", cause.message)
         }
         counter.bind(sucfailseq)
         counter.check("before seq succeed/fail", 0, 0, 0)
-        failure1.fail(Exception("Boo 1!"))
+        failure1.fail(SomeException("Boo 1!"))
         counter.check("after seq succeed/fail", 0, 1, 1)
 
         val failsucseq = RFuture.sequence(list(failure1, success2))
         failsucseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: SomeException: Boo 1!", cause.message)
         }
         counter.bind(failsucseq)
         counter.check("after seq fail/succeed", 0, 1, 1)
@@ -295,12 +295,12 @@ class RFutureTest {
         val fail2seq = RFuture.sequence(list(failure1, failure2))
         fail2seq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("2 failures: java.lang.Exception: Boo 1!, java.lang.Exception: Boo 2!",
+            assertEquals("2 failures: SomeException: Boo 1!, SomeException: Boo 2!",
                     cause.message)
         }
         counter.bind(fail2seq)
         counter.check("before seq fail/fail", 0, 0, 0)
-        failure2.fail(Exception("Boo 2!"))
+        failure2.fail(SomeException("Boo 2!"))
         counter.check("after seq fail/fail", 0, 1, 1)
     }
 
@@ -350,5 +350,14 @@ class RFutureTest {
         list.add(one)
         list.add(two)
         return list
+    }
+}
+
+/** Dummy exception that has consistent toString() behavior across platforms.
+ * [kotlin.Exception] would print `java.lang.Exception` on jvm backend and `Exception` in js backend.
+ */
+class SomeException(message: String) : Exception(message) {
+    override fun toString(): String {
+        return "SomeException: $message"
     }
 }

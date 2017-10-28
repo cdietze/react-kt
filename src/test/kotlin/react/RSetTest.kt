@@ -26,6 +26,7 @@ import kotlin.test.assertTrue
 class RSetTest {
     class Counter : RSet.Listener<Any>() {
         var notifies: Int = 0
+
         override fun onAdd(elem: Any) {
             notifies++
         }
@@ -120,8 +121,8 @@ class RSetTest {
 
         // listen for notifications
         val counter = SignalTest.Counter()
-        containsOne.connect(counter)
-        containsTwo.connect(counter)
+        containsOne.connect(counter.slot)
+        containsTwo.connect(counter.slot)
 
         // remove the element for one and ensure that we're notified
         containsOne.connect(SignalTest.require(false)).once()
@@ -159,7 +160,7 @@ class RSetTest {
         assertEquals(0, set.sizeView.get().toLong())
 
         val counter = SignalTest.Counter()
-        set.sizeView.connect(counter)
+        set.sizeView.connect(counter.slot)
         set.add("two")
         assertEquals(1, counter.notifies.toLong())
         set.add("three")

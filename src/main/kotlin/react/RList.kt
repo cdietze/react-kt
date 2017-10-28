@@ -208,7 +208,12 @@ class RList<E>
 
     override fun removeAll(collection: Collection<E>): Boolean {
         var modified = false
-        for (o in collection) modified = modified or remove(o)
+        for (o in collection) {
+            // Cannot inline this because it would short-circuit in JS-backend, see
+            // https://discuss.kotlinlang.org/t/boolean-operations-in-js-backend-do-perform-short-circuit/5157
+            val r = remove(o)
+            modified = modified or r
+        }
         return modified
     }
 

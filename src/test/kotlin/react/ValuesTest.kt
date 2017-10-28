@@ -7,12 +7,13 @@ import kotlin.test.assertEquals
  * Tests aspects of the [Values] object.
  */
 class ValuesTest {
-    @Test fun testJoinedValue() {
+    @Test
+    fun testJoinedValue() {
         val number = Value(1)
         val string = Value("foo")
         val both = Values.join(number, string)
         val counter = SignalTest.Counter()
-        both.connect(counter)
+        both.connect(counter.slot)
         number.update(2)
         assertEquals(1, counter.notifies.toLong())
         assertEquals(Pair(2, "foo"), both.get())
@@ -24,7 +25,8 @@ class ValuesTest {
         assertEquals(2, counter.notifies.toLong())
     }
 
-    @Test fun testNot() {
+    @Test
+    fun testNot() {
         val a = Value(false)
         val not = Values.not(a)
         assertEquals(true, not.get())
@@ -32,7 +34,8 @@ class ValuesTest {
         assertEquals(false, not.get())
     }
 
-    @Test fun testAndValues() {
+    @Test
+    fun testAndValues() {
         val a = Value(false)
         val b = Value(false)
         val and = Values.and(a, b)
@@ -45,7 +48,8 @@ class ValuesTest {
         assertEquals(false, and.get())
     }
 
-    @Test fun testOrValues() {
+    @Test
+    fun testOrValues() {
         val a = Value(false)
         val b = Value(false)
         val or = Values.or(a, b)
