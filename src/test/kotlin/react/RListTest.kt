@@ -131,7 +131,8 @@ class RListTest {
         assertEquals(0, list.sizeView.get().toLong())
 
         val counter = SignalTest.Counter()
-        list.sizeView.connect(counter)
+        val a: UnitSlot = counter.slot
+        list.sizeView.connect(counter.slot)
         list.add("two")
         assertEquals(1, counter.notifies.toLong())
         list.add("three")
