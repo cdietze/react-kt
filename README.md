@@ -1,9 +1,9 @@
-React.kt
+React-kt
 ===
 
-[![Build Status](https://travis-ci.org/cdietze/react.kt.svg?branch=master)](https://travis-ci.org/cdietze/react.kt)
+[![Build Status](https://travis-ci.org/cdietze/react-kt.svg?branch=master)](https://travis-ci.org/cdietze/react-kt)
 
-React.kt is a low-level library in Kotlin that provides [signal/slot] and [functional reactive programming]-like
+React-kt is a low-level library in Kotlin that provides [signal/slot] and [functional reactive programming]-like
 primitives. It can serve as the basis for a user interface toolkit, or any other library that has a
 model on which clients will listen and to which they will react.
 
