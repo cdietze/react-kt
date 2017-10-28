@@ -13,11 +13,11 @@ It is still in early development. The idea is to make it usable in both JVM and 
 Building
 ---
 
-The library is built using [Maven].
+The library is built using [Gradle].
 
-Invoke `mvn install` to build and install the library to your local Maven repository (i.e.
-`~/.m2/repository`).
+Invoke `./gradlew build` to build the library or
+`./gradlew publishToMavenLocal` to install it to your local Maven repository.
 
 [signal/slot]: http://en.wikipedia.org/wiki/Signals_and_slots
 [functional reactive programming]: http://en.wikipedia.org/wiki/Functional_reactive_programming
-[Maven]: http://maven.apache.org/
+[Gradle]: https://gradle.org/
