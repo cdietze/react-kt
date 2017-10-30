@@ -19,6 +19,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    // not sure exactly, why the reflection lib is necessary. The build will crash elsewise.
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     expectedBy project(":")
     testCompile "junit:junit:4.12"
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
