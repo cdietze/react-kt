@@ -8,7 +8,6 @@ primitives. It can serve as the basis for a user interface toolkit, or any other
 model on which clients will listen and to which they will react.
 
 It is a port in Kotlin of the [React project in java](https://github.com/threerings/react).
-It is still in early development. The idea is to make it usable in both JVM and JS. 
 
 Building
 ---
