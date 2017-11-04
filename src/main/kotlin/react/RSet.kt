@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,7 @@ class RSet<E>
      * value will report a change when the specified element is added or removed. Note that [ ][.addForce] or [.removeForce] will cause this view to trigger and incorrectly report
      * that the element was not or was previously contained in the set. Caveat user.
      */
-    fun containsView(elem: E?): ValueView<Boolean> {
-        if (elem == null) throw NullPointerException("Must supply non-null 'elem'.")
+    fun containsView(elem: E): ValueView<Boolean> {
         return object : MappedValue<Boolean>() {
             override fun get(): Boolean {
                 return contains(elem)
@@ -115,9 +114,10 @@ class RSet<E>
     }
 
     // from interface Set<E>
-    override val size: Int get() {
-        return _impl.size
-    }
+    override val size: Int
+        get() {
+            return _impl.size
+        }
 
     // from interface Set<E>
     override fun isEmpty(): Boolean {
@@ -155,7 +155,10 @@ class RSet<E>
     override fun addAll(coll: Collection<E>): Boolean {
         var modified = false
         for (elem in coll) {
-            modified = modified or add(elem)
+            // Cannot inline this because it would short-circuit in JS-backend, see
+            // https://discuss.kotlinlang.org/t/boolean-operations-in-js-backend-do-perform-short-circuit/5157
+            val r = add(elem)
+            modified = modified or r
         }
         return modified
     }
@@ -178,7 +181,10 @@ class RSet<E>
         var modified = false
         val iter = coll.iterator()
         while (iter.hasNext()) {
-            modified = modified or remove(iter.next())
+            // Cannot inline this because it would short-circuit in JS-backend, see
+            // https://discuss.kotlinlang.org/t/boolean-operations-in-js-backend-do-perform-short-circuit/5157
+            val r = remove(iter.next())
+            modified = modified or r
         }
         return modified
     }

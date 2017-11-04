@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package react
 
-import org.junit.Assert.*
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicInteger
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests aspects of the [Value] class.
  */
 class ValueTest {
-    @Test fun testSimpleListener() {
+    @Test
+    fun testSimpleListener() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connect { nvalue: Int, ovalue: Int? ->
@@ -37,7 +39,8 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testAsSignal() {
+    @Test
+    fun testAsSignal() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connect { value ->
@@ -48,16 +51,18 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testAsOnceSignal() {
+    @Test
+    fun testAsOnceSignal() {
         val value = Value(42)
         val counter = SignalTest.Counter()
-        value.connect(counter).once()
+        value.connect(counter.slot).once()
         value.update(15)
         value.update(42)
         assertEquals(1, counter.notifies.toLong())
     }
 
-    @Test fun testSignalListener() {
+    @Test
+    fun testSignalListener() {
         // this ensures that our SignalListener -> ValueListener wrapping is working until we
         // switch to the Java 1.8-only approach which will combine those two interfaces into a
         // subtype relationship using a default method
@@ -71,12 +76,13 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testMappedValue() {
+    @Test
+    fun testMappedValue() {
         val value = Value(42)
         val mapped = value.map(Int::toString)
 
         val counter = SignalTest.Counter()
-        val c1 = mapped.connect(counter)
+        val c1 = mapped.connect(counter.slot)
         val c2 = mapped.connect(SignalTest.require("15"))
 
         value.update(15)
@@ -92,7 +98,8 @@ class ValueTest {
         assertFalse(value.hasConnections())
     }
 
-    @Test fun testFlatMappedValue() {
+    @Test
+    fun testFlatMappedValue() {
         val value1 = Value(42)
         val value2 = Value(24)
         val toggle = Value(true)
@@ -103,9 +110,9 @@ class ValueTest {
         val counter1 = SignalTest.Counter()
         val counter2 = SignalTest.Counter()
         val counterM = SignalTest.Counter()
-        val c1 = value1.connect(counter1)
-        val c2 = value2.connect(counter2)
-        val cM = flatMapped.connect(counterM)
+        val c1 = value1.connect(counter1.slot)
+        val c2 = value2.connect(counter2.slot)
+        val cM = flatMapped.connect(counterM.slot)
 
         flatMapped.connect(SignalTest.require(10)).once()
         value1.update(10)
@@ -131,7 +138,8 @@ class ValueTest {
         assertFalse(value2.hasConnections())
     }
 
-    @Test fun testConnectionlessFlatMappedValue() {
+    @Test
+    fun testConnectionlessFlatMappedValue() {
         val value1 = Value(42)
         val value2 = Value(24)
         val toggle = Value(true)
@@ -143,7 +151,8 @@ class ValueTest {
         assertEquals(24, flatMapped.get().toLong())
     }
 
-    @Test fun testConnectNotify() {
+    @Test
+    fun testConnectNotify() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connectNotify { value ->
@@ -153,7 +162,8 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testListenNotify() {
+    @Test
+    fun testListenNotify() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
         value.connectNotify { value ->
@@ -163,43 +173,48 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testDisconnect() {
+    @Test
+    fun testDisconnect() {
         val value = Value(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
-        val listener: ValueViewListener<Int> = object : ValueViewListener<Int> {
-            override fun invoke(newValue: Int, oldValue: Int?) {
-                assertEquals(expectedValue[0].toLong(), newValue.toInt().toLong())
-                fired[0] += 1
-                value.disconnect(this)
-            }
+
+        // Forward reference that we can use inside the function to reference itself
+        var listener: ValueViewListener<Int>? = null
+
+        val listenerImpl: ValueViewListener<Int> = fun(newValue: Int, oldValue: Int?) {
+            assertEquals(expectedValue[0].toLong(), newValue.toInt().toLong())
+            fired[0] += 1
+            value.disconnect(listener!!)
         }
+
+        listener = listenerImpl
+
         val conn = value.connectNotify(listener)
         expectedValue[0] = 12; value.update(expectedValue[0])
-        assertEquals("Disconnecting in listenNotify disconnects", 1, fired[0].toLong())
+        assertEquals(1, fired[0], "Disconnecting in listenNotify disconnects")
         conn.close()// Just see what happens when calling disconnect while disconnected
 
         value.connect(listener)
-        value.connect(SignalTest.Counter())
+        value.connect(SignalTest.Counter().slot)
         value.connect(listener)
         expectedValue[0] = 13; value.update(expectedValue[0])
         expectedValue[0] = 14; value.update(expectedValue[0])
-        assertEquals("Disconnecting in listen disconnects", 3, fired[0].toLong())
+        assertEquals(3, fired[0].toLong(), "Disconnecting in listen disconnects")
 
         value.connect(listener).close()
         expectedValue[0] = 15; value.update(expectedValue[0])
-        assertEquals("Disconnecting before geting an update still disconnects", 3, fired[0].toLong())
+        assertEquals(3, fired[0].toLong(), "Disconnecting before getting an update still disconnects")
     }
 
-    @Test fun testSlot() {
+    @Test
+    fun testSlot() {
         val value = Value(42)
         val expectedValue = intArrayOf(value.get())
         val fired = intArrayOf(0)
-        val listener = object : Slot<Int> {
-            override fun invoke(newValue: Int) {
-                assertEquals(expectedValue[0], newValue)
-                fired[0] += 1
-            }
+        val listener: Slot<Int> = fun(newValue: Int) {
+            assertEquals(expectedValue[0], newValue)
+            fired[0] += 1
         }
         val con = value.connect(listener)
         expectedValue[0] = 12; value.update(expectedValue[0])
@@ -210,39 +225,8 @@ class ValueTest {
         assertEquals(1, fired[0])
     }
 
-    @Test fun testWeakListener() {
-        val value = Value(42)
-        val fired = AtomicInteger(0)
-
-        var listener: ValueViewListener<Int>? = { value: Int, oldValue: Int? -> fired.incrementAndGet() }
-        System.gc()
-        System.gc()
-        System.gc()
-
-        val conn = value.addConnection(listener)
-        value.update(41)
-        assertEquals(1, fired.get().toLong())
-        assertTrue(value.hasConnections())
-
-        // make sure that calling holdWeakly twice doesn't cause weirdness
-        conn.holdWeakly()
-        value.update(42)
-        assertEquals(2, fired.get().toLong())
-        assertTrue(value.hasConnections())
-
-        // clear out the listener and do our best to convince the JVM to collect it
-        listener = null
-        System.gc()
-        System.gc()
-        System.gc()
-
-        // now check that the listener has been collected and is not notified
-        value.update(40)
-        assertEquals(2, fired.get().toLong())
-        assertFalse(value.hasConnections())
-    }
-
-    @Test fun testChanges() {
+    @Test
+    fun testChanges() {
         val value = Value(42)
         val fired = booleanArrayOf(false)
         value.changes().connect { v: Int ->
@@ -253,10 +237,11 @@ class ValueTest {
         assertTrue(fired[0])
     }
 
-    @Test fun testChangesNext() {
+    @Test
+    fun testChangesNext() {
         val value = Value(42)
         val counter = SignalTest.Counter()
-        value.changes().next().onSuccess(counter)
+        value.changes().next().onSuccess(counter.slot)
         value.update(15)
         value.update(42)
         assertEquals(1, counter.notifies.toLong())
