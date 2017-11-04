@@ -1,0 +1,2 @@
+rootProject.name = 'react-kt'
+include 'react-kt-jvm', 'react-kt-js'

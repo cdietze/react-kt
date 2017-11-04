@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package react
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class RListTest {
     class Counter : RList.Listener<Any>() {
@@ -131,7 +131,8 @@ class RListTest {
         assertEquals(0, list.sizeView.get().toLong())
 
         val counter = SignalTest.Counter()
-        list.sizeView.connect(counter)
+        val a: UnitSlot = counter.slot
+        list.sizeView.connect(counter.slot)
         list.add("two")
         assertEquals(1, counter.notifies.toLong())
         list.add("three")

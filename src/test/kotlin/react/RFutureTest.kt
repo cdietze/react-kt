@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package react
 
-import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RFutureTest {
 
@@ -29,9 +30,9 @@ class RFutureTest {
 
         fun bind(future: RFuture<*>) {
             reset()
-            future.onSuccess(successes)
-            future.onFailure(failures)
-            future.onComplete(completes)
+            future.onSuccess(successes.slot)
+            future.onFailure(failures.slot)
+            future.onComplete(completes.slot)
         }
 
         fun check(state: String, scount: Int, fcount: Int, ccount: Int) {
@@ -47,7 +48,8 @@ class RFutureTest {
         }
     }
 
-    @Test fun testImmediate() {
+    @Test
+    fun testImmediate() {
         val counter = FutureCounter()
 
         val success = RFuture.success("Yay!")
@@ -59,7 +61,8 @@ class RFutureTest {
         counter.check("immediate failure", 0, 1, 1)
     }
 
-    @Test fun testDeferred() {
+    @Test
+    fun testDeferred() {
         val counter = FutureCounter()
 
         val success = RPromise.create<String>()
@@ -78,7 +81,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testMappedImmediate() {
+    @Test
+    fun testMappedImmediate() {
         val counter = FutureCounter()
 
         val success: RFuture<String?> = RFuture.success("Yay!")
@@ -90,7 +94,8 @@ class RFutureTest {
         counter.check("immediate failure", 0, 1, 1)
     }
 
-    @Test fun testMappedDeferred() {
+    @Test
+    fun testMappedDeferred() {
         val counter = FutureCounter()
 
         val success = RPromise.create<String?>()
@@ -109,7 +114,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testFlatMappedImmediate() {
+    @Test
+    fun testFlatMappedImmediate() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
         val ccounter = FutureCounter()
@@ -140,7 +146,8 @@ class RFutureTest {
         ccounter.check("immediate failure/crash", 0, 1, 1)
     }
 
-    @Test fun testFlatMappedDeferred() {
+    @Test
+    fun testFlatMappedDeferred() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
         val successMap: (String) -> RFuture<Boolean> = { _ ->
@@ -171,7 +178,8 @@ class RFutureTest {
         assertFalse(failure.hasConnections())
     }
 
-    @Test fun testFlatMappedDoubleDeferred() {
+    @Test
+    fun testFlatMappedDoubleDeferred() {
         val scounter = FutureCounter()
         val fcounter = FutureCounter()
 
@@ -220,7 +228,8 @@ class RFutureTest {
         }
     }
 
-    @Test fun testSequenceImmediate() {
+    @Test
+    fun testSequenceImmediate() {
         val counter = FutureCounter()
 
         val success1 = RFuture.success("Yay 1!")
@@ -246,7 +255,8 @@ class RFutureTest {
         counter.check("immediate seq failure/failure", 0, 1, 1)
     }
 
-    @Test fun testSequenceDeferred() {
+    @Test
+    fun testSequenceDeferred() {
         val counter = FutureCounter()
 
         val success1 = RPromise.create<String>()
@@ -267,17 +277,17 @@ class RFutureTest {
         val sucfailseq = RFuture.sequence(list(success1, failure1))
         sucfailseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: SomeException: Boo 1!", cause.message)
         }
         counter.bind(sucfailseq)
         counter.check("before seq succeed/fail", 0, 0, 0)
-        failure1.fail(Exception("Boo 1!"))
+        failure1.fail(SomeException("Boo 1!"))
         counter.check("after seq succeed/fail", 0, 1, 1)
 
         val failsucseq = RFuture.sequence(list(failure1, success2))
         failsucseq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("1 failures: java.lang.Exception: Boo 1!", cause.message)
+            assertEquals("1 failures: SomeException: Boo 1!", cause.message)
         }
         counter.bind(failsucseq)
         counter.check("after seq fail/succeed", 0, 1, 1)
@@ -285,23 +295,25 @@ class RFutureTest {
         val fail2seq = RFuture.sequence(list(failure1, failure2))
         fail2seq.onFailure { cause: Throwable ->
             assertTrue(cause is MultiFailureException)
-            assertEquals("2 failures: java.lang.Exception: Boo 1!, java.lang.Exception: Boo 2!",
+            assertEquals("2 failures: SomeException: Boo 1!, SomeException: Boo 2!",
                     cause.message)
         }
         counter.bind(fail2seq)
         counter.check("before seq fail/fail", 0, 0, 0)
-        failure2.fail(Exception("Boo 2!"))
+        failure2.fail(SomeException("Boo 2!"))
         counter.check("after seq fail/fail", 0, 1, 1)
     }
 
-    @Test fun testSequenceEmpty() {
+    @Test
+    fun testSequenceEmpty() {
         val counter = FutureCounter()
         val seq = RFuture.sequence(emptyList<RFuture<String>>())
         counter.bind(seq)
         counter.check("sequence empty list succeeds", 1, 0, 1)
     }
 
-    @Test fun testSequenceTuple() {
+    @Test
+    fun testSequenceTuple() {
         val counter = FutureCounter()
         val string = RFuture.success("string")
         val integer = RFuture.success(42)
@@ -324,7 +336,8 @@ class RFutureTest {
         counter.check("tuple2 seq fail/success", 0, 1, 1)
     }
 
-    @Test fun testCollectEmpty() {
+    @Test
+    fun testCollectEmpty() {
         val counter = FutureCounter()
         val seq = RFuture.collect(emptyList<RFuture<String>>())
         counter.bind(seq)
@@ -337,5 +350,14 @@ class RFutureTest {
         list.add(one)
         list.add(two)
         return list
+    }
+}
+
+/** Dummy exception that has consistent toString() behavior across platforms.
+ * [kotlin.Exception] would print `java.lang.Exception` on jvm backend and `Exception` in js backend.
+ */
+class SomeException(message: String) : Exception(message) {
+    override fun toString(): String {
+        return "SomeException: $message"
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,6 @@ abstract class RFuture<out T> : Reactor() {
     /** Returns a value that indicates whether this future has completed.
      * Initialized lazily. */
     val isComplete: ValueView<Boolean> by lazy {
-        println("CREATING new isComplete value")
         val isCompleteView = Value(false)
         onComplete({ isCompleteView.update(true) })
         isCompleteView
@@ -179,18 +178,20 @@ abstract class RFuture<out T> : Reactor() {
             val count = futures.size
 
             class Sequencer {
-                @Synchronized fun onResult(idx: Int, result: Try<T>) {
-                    if (result.isSuccess()) {
-                        _results[idx] = result.get()
-                    } else {
-                        if (_error == null) _error = MultiFailureException()
-                        _error!!.addFailure(result.failure())
-                    }
-                    if (--_remain == 0) {
-                        _error?.let { pseq.fail(it) }
-                        if (_error == null) {
-                            val results = _results as Array<T>
-                            pseq.succeed(results.asList())
+                fun onResult(idx: Int, result: Try<T>) {
+                    synchronized(this) {
+                        if (result.isSuccess()) {
+                            _results[idx] = result.get()
+                        } else {
+                            if (_error == null) _error = MultiFailureException()
+                            _error!!.addFailure(result.failure())
+                        }
+                        if (--_remain == 0) {
+                            _error?.let { pseq.fail(it) }
+                            if (_error == null) {
+                                val results = _results as Array<T>
+                                pseq.succeed(results.asList())
+                            }
                         }
                     }
                 }

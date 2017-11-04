@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package react
 
-import org.junit.Assert.assertEquals
+import kotlin.test.assertEquals
 
 object TestBase {
 
-    class Counter : Slot<Any?> {
+    class Counter {
         fun trigger() {
             _count++
         }
@@ -30,16 +30,14 @@ object TestBase {
         }
 
         fun assertTriggered(message: String, count: Int) {
-            assertEquals(message, count.toLong(), _count.toLong())
+            assertEquals(count.toLong(), _count.toLong(), message)
         }
 
         fun reset() {
             _count = 0
         }
 
-        override fun invoke(value: Any?) {
-            trigger()
-        }
+        val slot: UnitSlot = fun(_: Any?) { trigger() }
 
         private var _count: Int = 0
     }

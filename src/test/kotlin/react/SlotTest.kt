@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package react
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 /**
  * Tests basic signals and slots behavior.
@@ -26,7 +26,8 @@ class SlotTest {
     open class A
     class B : A()
 
-    @Test fun andThenShouldBeCalledAfterwards() {
+    @Test
+    fun andThenShouldBeCalledAfterwards() {
         var s = ""
         val a: Slot<A> = { s += "a" }
         val b: Slot<B> = { s += "b" }
@@ -35,7 +36,8 @@ class SlotTest {
         assertEquals(s, "ab")
     }
 
-    @Test fun beforeShouldBeCalledBefore() {
+    @Test
+    fun beforeShouldBeCalledBefore() {
         var s = ""
         val a: Slot<A> = { s += "a" }
         val b: Slot<B> = { s += "b" }

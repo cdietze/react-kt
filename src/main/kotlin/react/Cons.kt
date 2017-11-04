@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The React.kt Authors
+ * Copyright 2017 The React-kt Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 
 package react
-
-import java.lang.ref.WeakReference
 
 /**
  * Implements [Connection] and a linked-list style listener list for [Reactor]s.
