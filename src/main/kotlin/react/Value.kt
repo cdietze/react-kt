@@ -28,7 +28,7 @@ open class Value<T>
 
     /**
      * Updates this instance with the supplied value. Registered listeners are notified only if the
-     * value differs from the current value, as determined via [Object.equals].
+     * value differs from the current value, as determined via [Any.equals].
      * @return the previous value contained by this instance.
      */
     fun update(value: T): T {
