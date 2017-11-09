@@ -13,32 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package react
 
-import kotlin.test.assertEquals
+class NotificationCounter {
 
-object TestBase {
+    var notifies: Int = 0
+        private set
 
-    class Counter {
-        fun trigger() {
-            _count++
-        }
+    fun reset() {
+        notifies = 0
+    }
 
-        fun assertTriggered(count: Int) {
-            assertEquals(count.toLong(), _count.toLong())
-        }
-
-        fun assertTriggered(message: String, count: Int) {
-            assertEquals(count.toLong(), _count.toLong(), message)
-        }
-
-        fun reset() {
-            _count = 0
-        }
-
-        val slot: UnitSlot = fun(_: Any?) { trigger() }
-
-        private var _count: Int = 0
+    val slot: UnitSlot = fun(_: Any?) {
+        notifies++
     }
 }

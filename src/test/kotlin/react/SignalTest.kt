@@ -24,12 +24,6 @@ import kotlin.test.*
  */
 open class SignalTest {
 
-    // TODO: merge with [TestBase.Counter]
-    class Counter {
-        var notifies: Int = 0
-        var slot: UnitSlot = fun(_: Any?) { notifies++ }
-    }
-
     @Test
     fun testSignalToSlot() {
         val signal = Signal<Int>()
@@ -72,10 +66,10 @@ open class SignalTest {
         signal.connect(slot2.slot).atPrio(3)
         signal.connect(slot4.slot).atPrio(1)
         signal.emit()
-        assertEquals(1, slot1.order.toLong())
-        assertEquals(2, slot2.order.toLong())
-        assertEquals(3, slot3.order.toLong())
-        assertEquals(4, slot4.order.toLong())
+        assertEquals(1, slot1.order)
+        assertEquals(2, slot2.order)
+        assertEquals(3, slot3.order)
+        assertEquals(4, slot4.order)
     }
 
     @Test
@@ -86,7 +80,7 @@ open class SignalTest {
 
         // this will connect our new signal but not dispatch to it
         signal.emit(5)
-        assertEquals(0, toAdd.events.size.toLong())
+        assertEquals(0, toAdd.events.size)
 
         // now dispatch an event that should go to the added signal
         signal.emit(42)
@@ -137,7 +131,7 @@ open class SignalTest {
         // make sure toRemove got this event (in this case the adder/remover signal fires *after*
         // toRemove gets the event) and toAdd didn't
         assertEquals(listOf(5, 42), toRemove.events)
-        assertEquals(0, toAdd.events.size.toLong())
+        assertEquals(0, toAdd.events.size)
 
         // finally emit one more and ensure that toAdd got it and toRemove didn't
         signal.emit(9)
@@ -205,14 +199,14 @@ open class SignalTest {
         val signal = Signal<Int>()
         val mapped = signal.map(Int::toString)
 
-        val counter = Counter()
+        val counter = NotificationCounter()
         val c1 = mapped.connect(counter.slot)
         val c2 = mapped.connect(require("15"))
 
         signal.emit(15)
-        assertEquals(1, counter.notifies.toLong())
+        assertEquals(1, counter.notifies)
         signal.emit(15)
-        assertEquals(2, counter.notifies.toLong())
+        assertEquals(2, counter.notifies)
 
         // disconnect from the mapped signal and ensure that it clears its connection
         c1.close()
@@ -231,7 +225,7 @@ open class SignalTest {
         sig.filter({ it != null }).connect(onString)
         sig.emit(null)
         sig.emit("foozle")
-        assertEquals(1, triggered[0].toLong())
+        assertEquals(1, triggered[0])
     }
 
     @Test
@@ -245,7 +239,7 @@ open class SignalTest {
         sig.connect(onString.filtered({ it != null }))
         sig.emit(null)
         sig.emit("foozle")
-        assertEquals(1, triggered[0].toLong())
+        assertEquals(1, triggered[0])
     }
 
     @Test

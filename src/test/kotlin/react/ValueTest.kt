@@ -54,7 +54,7 @@ class ValueTest {
     @Test
     fun testAsOnceSignal() {
         val value = Value(42)
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         value.connect(counter.slot).once()
         value.update(15)
         value.update(42)
@@ -81,7 +81,7 @@ class ValueTest {
         val value = Value(42)
         val mapped = value.map(Int::toString)
 
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         val c1 = mapped.connect(counter.slot)
         val c2 = mapped.connect(SignalTest.require("15"))
 
@@ -107,9 +107,9 @@ class ValueTest {
             if (toggle) value1 else value2
         }
 
-        val counter1 = SignalTest.Counter()
-        val counter2 = SignalTest.Counter()
-        val counterM = SignalTest.Counter()
+        val counter1 = NotificationCounter()
+        val counter2 = NotificationCounter()
+        val counterM = NotificationCounter()
         val c1 = value1.connect(counter1.slot)
         val c2 = value2.connect(counter2.slot)
         val cM = flatMapped.connect(counterM.slot)
@@ -196,7 +196,7 @@ class ValueTest {
         conn.close()// Just see what happens when calling disconnect while disconnected
 
         value.connect(listener)
-        value.connect(SignalTest.Counter().slot)
+        value.connect(NotificationCounter().slot)
         value.connect(listener)
         expectedValue[0] = 13; value.update(expectedValue[0])
         expectedValue[0] = 14; value.update(expectedValue[0])
@@ -240,7 +240,7 @@ class ValueTest {
     @Test
     fun testChangesNext() {
         val value = Value(42)
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         value.changes().next().onSuccess(counter.slot)
         value.update(15)
         value.update(42)
