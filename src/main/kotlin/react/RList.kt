@@ -259,9 +259,10 @@ class RList<E>
         return _impl.hashCode()
     }
 
-    override val size: Int get() {
-        return _impl.size
-    }
+    override val size: Int
+        get() {
+            return _impl.size
+        }
 
     override fun isEmpty(): Boolean {
         return _impl.isEmpty()
