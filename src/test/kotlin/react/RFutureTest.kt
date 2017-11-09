@@ -24,9 +24,9 @@ import kotlin.test.assertTrue
 class RFutureTest {
 
     inner class FutureCounter {
-        val successes = TestBase.Counter()
-        val failures = TestBase.Counter()
-        val completes = TestBase.Counter()
+        val successes = NotificationCounter()
+        val failures = NotificationCounter()
+        val completes = NotificationCounter()
 
         fun bind(future: RFuture<*>) {
             reset()
@@ -36,9 +36,9 @@ class RFutureTest {
         }
 
         fun check(state: String, scount: Int, fcount: Int, ccount: Int) {
-            successes.assertTriggered("Successes " + state, scount)
-            failures.assertTriggered("Failures " + state, fcount)
-            completes.assertTriggered("Completes " + state, ccount)
+            assertEquals(scount, successes.notifies, "Successes " + state)
+            assertEquals(fcount, failures.notifies, "Failures " + state)
+            assertEquals(ccount, completes.notifies, "Completes " + state)
         }
 
         fun reset() {

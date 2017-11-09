@@ -12,7 +12,7 @@ class ValuesTest {
         val number = Value(1)
         val string = Value("foo")
         val both = Values.join(number, string)
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         both.connect(counter.slot)
         number.update(2)
         assertEquals(1, counter.notifies.toLong())

@@ -120,7 +120,7 @@ class RSetTest {
         assertFalse(containsTwo.get())
 
         // listen for notifications
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         containsOne.connect(counter.slot)
         containsTwo.connect(counter.slot)
 
@@ -159,7 +159,7 @@ class RSetTest {
         set.remove("one")
         assertEquals(0, set.sizeView.get().toLong())
 
-        val counter = SignalTest.Counter()
+        val counter = NotificationCounter()
         set.sizeView.connect(counter.slot)
         set.add("two")
         assertEquals(1, counter.notifies.toLong())
