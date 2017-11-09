@@ -141,7 +141,7 @@ class RSet<E>
     override fun remove(rawElem: E): Boolean {
         checkMutate()
         if (!_impl.remove(rawElem)) return false
-        val elem = rawElem as E
+        val elem = rawElem
         emitRemove(elem)
         return true
     }
