@@ -223,7 +223,7 @@ abstract class Reactor {
 
         /**
          * Returns true if both values are null, reference the same instance, or are
-         * [Object.equals].
+         * [Any.equals].
          */
         fun <T> areEqual(o1: T?, o2: T): Boolean {
             return o1 === o2 || o1 != null && o1 == o2
