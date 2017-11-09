@@ -36,7 +36,6 @@ abstract class Reactor {
      * Clears all connections from this reactor. This is not used in normal circumstances, but is
      * made available for libraries which build on react and need a way to forcibly disconnect all
      * connections to reactive state.
-
      * @throws IllegalStateException if this reactor is in the middle of dispatching an event.
      */
     fun clearConnections() {

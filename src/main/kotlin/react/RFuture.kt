@@ -120,7 +120,6 @@ abstract class RFuture<out T> : Reactor() {
     }
 
     /** Returns the result of this future, or null if it is not yet complete.
-
      *
      * *NOTE:* don't use this method! You should wire up reactions to the completion of
      * this future via [.onSuccess] or [.onFailure]. React is not a blocking async
