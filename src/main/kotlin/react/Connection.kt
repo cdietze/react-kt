@@ -31,21 +31,18 @@ abstract class Connection : Closeable {
     /**
      * Converts this connection into a one-shot connection. After the first time the slot or
      * listener is notified, it will automatically be disconnected.
-
      *
      * *NOTE:* if you are dispatching signals in a multithreaded environment, it is
      * possible for your connected listener to be notified before this call has a chance to mark it
      * as one-shot. Thus you could receive multiple notifications. If you require this to be
      * avoided, you must synchronize on the signal/value/etc. on which you are adding a
      * listener:
-
      * <pre>`Signal<Foo> signal = ...;
      * Connection conn;
      * synchronized (signal) {
      * conn = signal.connect(slot).once();
      * }
     `</pre> *
-
      * @return this connection instance for convenient chaining.
      */
     abstract fun once(): Connection
@@ -53,27 +50,22 @@ abstract class Connection : Closeable {
     /**
      * Changes the priority of this connection to the specified value. Connections are notified from
      * highest priority to lowest priority. The default priority is zero.
-
      *
      * This should generally be done simultaneously with creating a connection. For example:
-
      * <pre>`Signal<Foo> signal = ...;
      * Connection conn = signal.connect(new Slot<Foo>() { ... }).atPrio(5);
     `</pre> *
-
      *
      * *NOTE:* if you are dispatching signals in a multithreaded environment, it is
      * possible for your connected listener to be notified at priority zero before this call has a
      * chance to update its priority. If you require this to be avoided, you must synchronize on
      * the signal/value/etc. on which you are adding a listener:
-
      * <pre>`Signal<Foo> signal = ...;
      * Connection conn;
      * synchronized (signal) {
      * conn = signal.connect(slot).atPrio(5);
      * }
     `</pre> *
-
      * @return this connection instance for convenient chaining.
      */
     abstract fun atPrio(priority: Int): Connection
@@ -81,11 +73,9 @@ abstract class Connection : Closeable {
     /**
      * Changes this connection to one held by a weak reference. It only remains connected as long
      * as its target listener is referenced elsewhere.
-
      *
      * *NOTE:* weak references are not supported in JavaScript. When using this library
      * in GWT, the reference remains strong.
-
      * @return this connection instance for convenient chaining.
      */
     abstract fun holdWeakly(): Connection

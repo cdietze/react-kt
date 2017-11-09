@@ -26,7 +26,6 @@ internal abstract class MappedValue<T> : AbstractValue<T>() {
     /**
      * Establishes a connection to our source value. Called when go from zero to one listeners.
      * When we go from one to zero listeners, the connection will automatically be cleared.
-
      * @return the newly established connection.
      */
     protected abstract fun connect(): Connection

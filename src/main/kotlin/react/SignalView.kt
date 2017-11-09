@@ -45,7 +45,6 @@ interface SignalView<T> {
     /**
      * Connects this signal to the supplied slot, such that when an event is emitted from this
      * signal, the slot will be notified.
-
      * @return a connection instance which can be used to cancel the connection.
      */
     fun connect(slot: SignalViewListener<in T>): Connection
